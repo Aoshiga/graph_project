@@ -4,8 +4,8 @@ public class Node {
     
     //test
 
-    public int id;
-    public static int biggestId = 0;
+    private int id;
+    private static int biggestId = 0;
 
     Node() {
         this.id = ++biggestId;
@@ -32,4 +32,11 @@ public class Node {
         return id;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public static int getBiggestId() {
+        return biggestId;
+    }
 }
