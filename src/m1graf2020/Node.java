@@ -1,6 +1,8 @@
 package m1graf2020;
 
 public class Node {
+    
+    //test
 
     public int id;
     public static int biggestId = 0;
