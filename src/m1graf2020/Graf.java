@@ -13,6 +13,7 @@ public class Graf {
 
     Graf(int ... sa) {
         adjList = new HashMap<>();
+        edgeList = new ArrayList<>();
         int from = 1;
         addNode(from);
         for (int to : sa) {
@@ -214,6 +215,22 @@ public class Graf {
         return inDegree(id) + outDegree(id);
     }
 
+    public int[] toSuccessorArray() {
+        List<Integer> sa_list = new ArrayList<>();
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            for (Node n : entry.getValue()) {
+                sa_list.add(n.getId());
+            }
+            sa_list.add(0);
+        }
+        sa_list.remove(sa_list.size() -1);
+        int[] sa_array = new int[sa_list.size()];
+        for (int i = 0; i < sa_array.length; i++) {
+            sa_array[i] = sa_list.get(i);
+        }
+        return sa_array;
+    }
+
     public String toDotString() {
         StringBuilder dot = new StringBuilder("digraph name {\n");
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
@@ -227,6 +244,9 @@ public class Graf {
 
     public static void main(String[] args) {
         Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
-        System.out.println(g.toDotString());
+        int[] sa_array = g.toSuccessorArray();
+        for (int i : sa_array) {
+            System.out.print(i + " ");
+        }
     }
 }
