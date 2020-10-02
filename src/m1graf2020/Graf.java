@@ -1,28 +1,27 @@
 package m1graf2020;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Graf {
     Map<Node, List<Node>> adjList;
+    List<Edge> edgeList;
 
     Graf() {
         adjList = new HashMap<>();
+        edgeList = new ArrayList<>();
     }
 
     Graf(int ... sa) {
         adjList = new HashMap<>();
-        int cpt = 1;
-        addNode(cpt);
-
-        for (int i : sa) {
-            if(i != 0) {
-                getSuccessors(cpt).add(new Node(i));
+        int from = 1;
+        addNode(from);
+        for (int to : sa) {
+            if(to != 0) {
+                getSuccessors(from).add(new Node(to));
+                edgeList.add(new Edge(new Node(from), new Node(to)));
             }
             else {
-                addNode(++cpt);
+                addNode(++from);
             }
         }
     }
@@ -49,12 +48,170 @@ public class Graf {
         return adjList.get(new Node(id));
     }
 
+    public int nbNodes() { return adjList.keySet().size(); }
+
     public boolean existsNode(Node n) {
         return adjList.containsKey(n);
     }
 
     public boolean existsNode(int id) {
         return adjList.containsKey(new Node(id));
+    }
+
+    public void removeNode(int id) {
+        adjList.remove(new Node(id));
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            entry.getValue().remove(new Node(id));
+        }
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == id || e.getFrom().getId() == id) {
+                removeEdge(e);
+            }
+        }
+    }
+
+    public void removeNode(Node n) {
+        adjList.remove(n);
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            entry.getValue().remove(n);
+        }
+        for (Edge e : edgeList) {
+            if (e.getTo() == n || e.getFrom() == n) {
+                removeEdge(e);
+            }
+        }
+    }
+
+    public boolean adjacent(Node u, Node v) {
+        return adjList.get(u).contains(v) || adjList.get(v).contains(u);
+    }
+
+    public boolean adjacent(int u_id, int v_id) {
+        return getSuccessors(new Node(u_id)).contains(new Node(v_id)) || getSuccessors(new Node(v_id)).contains(new Node(u_id));
+    }
+
+    public List<Node> getAllNodes() {
+        Set<Node> keys = adjList.keySet();
+        return new ArrayList<>(keys);
+    }
+
+    public int nbEdges() { return edgeList.size(); }
+
+    public boolean existsEdge(Node u, Node v) { return adjacent(u, v); }
+
+    public boolean existsEdge(int u_id, int v_id) { return adjacent(u_id, v_id); }
+
+    public boolean existsEdge(Edge e) { return edgeList.contains(e); }
+
+    public void removeEdge(Node from, Node to) {
+        getSuccessors(from).remove(to);
+        edgeList.removeIf(e -> e.getFrom() == from && e.getTo() == to);
+    }
+
+    public void removeEdge(int from_id, int to_id) {
+        getSuccessors(from_id).remove(new Node(to_id));
+        edgeList.removeIf(e -> e.getFrom().getId() == from_id && e.getTo().getId() == to_id);
+    }
+
+    public void removeEdge(Edge e) {
+        getSuccessors(e.getFrom()).remove(e.getTo());
+        edgeList.remove(e);
+    }
+
+    public List<Edge> getOutEdges(Node n) {
+        List<Edge> outEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getFrom() == n) {
+                outEdges.add(e);
+            }
+        }
+        return outEdges;
+    }
+
+    public List<Edge> getOutEdges(int id) {
+        List<Edge> outEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getFrom().getId() == id) {
+                outEdges.add(e);
+            }
+        }
+        return outEdges;
+    }
+
+    public List<Edge> getInEdges(Node n) {
+        List<Edge> inEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getTo() == n) {
+                inEdges.add(e);
+            }
+        }
+        return inEdges;
+    }
+
+    public List<Edge> getInEdges(int id) {
+        List<Edge> inEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == id) {
+                inEdges.add(e);
+            }
+        }
+        return inEdges;
+    }
+
+    public List<Edge> getIncidentEdges(Node n) {
+        List<Edge> incidentEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getTo() == n || e.getFrom() == n) {
+                incidentEdges.add(e);
+            }
+        }
+        return incidentEdges;
+    }
+
+    public List<Edge> getIncidentEdges(int id) {
+        List<Edge> incidentEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == id || e.getFrom().getId() == id) {
+                incidentEdges.add(e);
+            }
+        }
+        return incidentEdges;
+    }
+
+    public List<Edge> getAllEdges() {
+        return edgeList;
+    }
+
+    public int inDegree(Node n) {
+        int inDegree = 0;
+        for (Edge e : edgeList) {
+            if (e.getTo() == n) inDegree++;
+        }
+        return inDegree;
+    }
+
+    public int inDegree(int id) {
+        int inDegree = 0;
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == id) inDegree++;
+        }
+        return inDegree;
+    }
+
+    public int outDegree(Node n) {
+        return getSuccessors(n).size();
+    }
+
+    public int outDegree(int id) {
+        return getSuccessors(id).size();
+    }
+
+    public int degree(Node n) {
+        return inDegree(n) + outDegree(n);
+    }
+
+    public int degree(int id) {
+        return inDegree(id) + outDegree(id);
     }
 
     public String toDotString() {
