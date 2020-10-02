@@ -231,6 +231,20 @@ public class Graf {
         return sa_array;
     }
 
+    public int[][] toAdjMatrix() {
+        int[][] adjMatrix = new int[nbNodes()][nbNodes()];
+        for (int[] matrix : adjMatrix) {
+            Arrays.fill(matrix, 0);
+        }
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            int node_id = entry.getKey().getId();
+            for (Node n : entry.getValue()) {
+                adjMatrix[node_id -1][n.getId() -1] = 1;
+            }
+        }
+        return adjMatrix;
+    }
+
     public String toDotString() {
         StringBuilder dot = new StringBuilder("digraph name {\n");
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
@@ -244,9 +258,14 @@ public class Graf {
 
     public static void main(String[] args) {
         Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
-        int[] sa_array = g.toSuccessorArray();
-        for (int i : sa_array) {
-            System.out.print(i + " ");
+        int[][] matrix = g.toAdjMatrix();
+        System.out.println(g.nbNodes());
+        for (int[] row : matrix) {
+            System.out.print("row");
+            for (int i : row) {
+                System.out.print(i + " ");
+            }
+            System.out.print("\n");
         }
     }
 }

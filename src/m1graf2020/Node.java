@@ -1,10 +1,10 @@
 package m1graf2020;
 
-public class Node {
+public class Node implements Comparable<Node>{
     
     //test
 
-    private int id;
+    private final int id;
     private static int biggestId = 0;
 
     Node() {
@@ -38,5 +38,10 @@ public class Node {
 
     public static int getBiggestId() {
         return biggestId;
+    }
+
+    @Override
+    public int compareTo(Node o) {
+        return Integer.compare(this.getId(), o.getId());
     }
 }
