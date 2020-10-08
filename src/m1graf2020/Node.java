@@ -44,4 +44,9 @@ public class Node implements Comparable<Node>{
     public int compareTo(Node o) {
         return Integer.compare(this.getId(), o.getId());
     }
+
+    @Override
+    public String toString() {
+        return "(" + this.getId() + ")";
+    }
 }
