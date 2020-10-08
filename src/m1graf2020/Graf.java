@@ -201,7 +201,9 @@ public class Graf {
     public int inDegree(Node n) {
         int inDegree = 0;
         for (Edge e : edgeList) {
-            if (e.getTo() == n) inDegree++;
+            if (e.getTo().getId() == n.getId()) {
+                inDegree++;
+            }
         }
         return inDegree;
     }
@@ -263,9 +265,12 @@ public class Graf {
     public String toDotString() {
         StringBuilder dot = new StringBuilder("digraph name {\n");
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            dot.append("\t").append(entry.getKey().getId());
+            if(!entry.getValue().isEmpty()) dot.append(" -> ");
             for (Node n : entry.getValue()) {
-                dot.append("\t").append(entry.getKey().getId()).append(" -> ").append(n.getId()).append(";\n");
+                dot.append(n.getId()).append(",");
             }
+            dot.append(";\n");
         }
         dot.append("}");
         return dot.toString();
