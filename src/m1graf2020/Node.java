@@ -1,8 +1,6 @@
 package m1graf2020;
 
 public class Node implements Comparable<Node>{
-    
-    //test
 
     private final int id;
     private static int biggestId = 0;
@@ -16,6 +14,7 @@ public class Node implements Comparable<Node>{
         if(this.id > biggestId) biggestId = this.id;
     }
 
+    // Ne fonctionne pas
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;

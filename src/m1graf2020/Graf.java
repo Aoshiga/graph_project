@@ -42,7 +42,7 @@ public class Graf {
     }
 
     public List<Node> getSuccessors(Node n) {
-        return adjList.get(n);
+        return getSuccessors(n.getId());
     }
 
     public List<Node> getSuccessors(int id) {
@@ -72,15 +72,7 @@ public class Graf {
     }
 
     public void removeNode(Node n) {
-        adjList.remove(n);
-        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            entry.getValue().remove(n);
-        }
-        for (Edge e : edgeList) {
-            if (e.getTo() == n || e.getFrom() == n) {
-                removeEdge(e);
-            }
-        }
+        removeNode(n.getId());
     }
 
     public boolean adjacent(Node u, Node v) {
@@ -130,18 +122,13 @@ public class Graf {
     }
 
     public void removeEdge(Edge e) {
+        System.out.println(getSuccessors(e.getFrom()));
         getSuccessors(e.getFrom()).remove(e.getTo());
         edgeList.remove(e);
     }
 
     public List<Edge> getOutEdges(Node n) {
-        List<Edge> outEdges = new ArrayList<>();
-        for (Edge e : edgeList) {
-            if (e.getFrom() == n) {
-                outEdges.add(e);
-            }
-        }
-        return outEdges;
+        return getOutEdges(n.getId());
     }
 
     public List<Edge> getOutEdges(int id) {
@@ -155,13 +142,7 @@ public class Graf {
     }
 
     public List<Edge> getInEdges(Node n) {
-        List<Edge> inEdges = new ArrayList<>();
-        for (Edge e : edgeList) {
-            if (e.getTo() == n) {
-                inEdges.add(e);
-            }
-        }
-        return inEdges;
+        return getInEdges(n.getId());
     }
 
     public List<Edge> getInEdges(int id) {
@@ -175,13 +156,7 @@ public class Graf {
     }
 
     public List<Edge> getIncidentEdges(Node n) {
-        List<Edge> incidentEdges = new ArrayList<>();
-        for (Edge e : edgeList) {
-            if (e.getTo() == n || e.getFrom() == n) {
-                incidentEdges.add(e);
-            }
-        }
-        return incidentEdges;
+        return getIncidentEdges(n.getId());
     }
 
     public List<Edge> getIncidentEdges(int id) {
@@ -268,7 +243,10 @@ public class Graf {
             dot.append("\t").append(entry.getKey().getId());
             if(!entry.getValue().isEmpty()) dot.append(" -> ");
             for (Node n : entry.getValue()) {
-                dot.append(n.getId()).append(",");
+                dot.append(n.getId()).append(", ");
+            }
+            if (dot.charAt(dot.length() -1) == ' ') {
+                dot.setLength(dot.length() -2);
             }
             dot.append(";\n");
         }
