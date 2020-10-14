@@ -237,6 +237,87 @@ public class Graf {
         return adjMatrix;
     }
 
+    public Graf getReverse() {
+        Graf reverse = new Graf();
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            for (Node n : entry.getValue()) {
+                if (!reverse.adjList.containsKey(n)) {
+                    reverse.addNode(n);
+                }
+                reverse.getSuccessors(n).add(entry.getKey());
+            }
+        }
+        return reverse;
+    }
+
+    public enum color{WHITE, GREY, BLACK}
+
+    public List<Node> getBFS() {
+        List<Node> bfs = new ArrayList<>();
+        color[] color = new color[adjList.size()];
+        int[] distance = new int[adjList.size()];
+        Node[] parent = new Node[adjList.size()];
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            for (Node n : entry.getValue()) {
+                color[n.getId()] = Graf.color.WHITE;
+                distance[n.getId()] = -1;
+                parent[n.getId()] = null;
+            }
+        }
+        color[1] = Graf.color.GREY;
+        distance[1] = 0;
+        parent[1] = null;
+        Queue<Node> queue = new PriorityQueue<>();
+        queue.add(new Node(1));
+        while (!queue.isEmpty()) {
+            Node u = queue.poll();
+            for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+                if (color[entry.getKey().getId()] == Graf.color.WHITE) {
+                    color[entry.getKey().getId()] = Graf.color.GREY;
+                    distance[entry.getKey().getId()] = distance[u.getId()] +1;
+                    parent[entry.getKey().getId()] = u;
+                    queue.add(entry.getKey());
+                }
+            }
+            color[u.getId()] = Graf.color.BLACK;
+        }
+        return bfs;
+    }
+
+    public List<Node> getDFS() {
+        List<Node> dfs = new ArrayList<>();
+        color[] color = new color[adjList.size()];
+        Node[] pi = new Node[adjList.size()];
+        int[] d = new int[adjList.size()];
+        int[] f = new int[adjList.size()];
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            color[entry.getKey().getId()] = Graf.color.WHITE;
+            pi[entry.getKey().getId()] = null;
+        }
+        int time = 0;
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            if (color[entry.getKey().getId()] == Graf.color.WHITE) {
+                dfs_visit(entry.getKey(), time, d, color, pi, f);
+            }
+        }
+        return dfs;
+    }
+
+    public void dfs_visit(Node u, int time, int[] d, color[] color, Node[] pi, int[] f) {
+        time = time + 1;
+        d[u.getId()] = time;
+        color[u.getId()] = Graf.color.GREY;
+        for (Node v : getSuccessors(u)) {
+            if (color[v.getId()] == Graf.color.WHITE) {
+                pi[v.getId()] = u;
+                dfs_visit(v, time, d, color, pi, f);
+            }
+        }
+        color[u.getId()] = Graf.color.BLACK;
+        time = time + 1;
+        f[u.getId()] = time;
+    }
+
     public String toDotString() {
         StringBuilder dot = new StringBuilder("digraph name {\n");
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
