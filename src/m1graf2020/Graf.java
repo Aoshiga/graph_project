@@ -118,14 +118,14 @@ public class Graf {
         if(from == null) addNode(from);
         if(to == null) addNode(to);
         edgeList.add(new Edge(from, to));
-        getSuccessors(from).add(to);
+        if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
     }
 
     void addEdge(int from_id, int to_id) {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
         edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
-        getSuccessors(from_id).add(new Node(to_id));
+        if (!getSuccessors(from_id).contains(to_id)) getSuccessors(from_id).add(new Node(to_id));
     }
 
     void addEdge(Edge e)
@@ -236,6 +236,7 @@ public class Graf {
     public int[] toSuccessorArray() {
         List<Integer> sa_list = new ArrayList<>();
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            Collections.sort(entry.getValue());
             for (Node n : entry.getValue()) {
                 sa_list.add(n.getId());
             }
@@ -270,10 +271,27 @@ public class Graf {
                 if (!reverse.adjList.containsKey(n)) {
                     reverse.addNode(n);
                 }
-                reverse.getSuccessors(n).add(entry.getKey());
+                reverse.addEdge(n, entry.getKey());
+            }
+            if (!reverse.adjList.containsKey(entry.getKey())) {
+                reverse.addNode(entry.getKey());
             }
         }
         return reverse;
+    }
+
+    public Graf getTransitiveClosure() {
+        Graf g = this;
+        Graf reverse = getReverse();
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            List<Node> predecessors = reverse.getSuccessors(entry.getKey());
+            for (Node p : predecessors) {
+                for (Node s : entry.getValue()) {
+                    g.addEdge(p, s);
+                }
+            }
+        }
+        return g;
     }
 
     public enum color{WHITE, GREY, BLACK}
@@ -345,10 +363,11 @@ public class Graf {
     }
 
     public String toDotString() {
-        StringBuilder dot = new StringBuilder("digraph name {\n");
+        StringBuilder dot = new StringBuilder("digraph {\n");
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
             dot.append("\t").append(entry.getKey().getId());
             if(!entry.getValue().isEmpty()) dot.append(" -> ");
+            Collections.sort(entry.getValue());
             for (Node n : entry.getValue()) {
                 dot.append(n.getId()).append(", ");
             }
@@ -489,11 +508,11 @@ public class Graf {
             System.out.println(""+n+": "+edges);
         }
 
-        //System.out.println(">>>>>>>>>>    Reverse graph");
-        //System.out.println(g.getReverse().toDotString());
+        System.out.println(">>>>>>>>>>    Reverse graph");
+        System.out.println(g.getReverse().toDotString());
 
-        //System.out.println(">>>>>>>>>>    Transitive Closure");
-        //System.out.println(g.getTransitiveClosure().toDotString());
+        System.out.println(">>>>>>>>>>    Transitive Closure");
+        System.out.println(g.getTransitiveClosure().toDotString());
 
         System.out.println(">>>>>>>>>>    Emptying the graph by removing all its nodes");
         nodes = g.getAllNodes();
