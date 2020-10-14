@@ -60,7 +60,7 @@ public class Graf {
     }
 
     public void removeNode(int id) {
-        Set<Edge> toDelete = new HashSet<Edge>();
+        Set<Edge> toDelete = new HashSet<>();
         for (Edge e : edgeList) {
             if (e.getTo().getId() == id || e.getFrom().getId() == id) {
                 toDelete.add(e);
@@ -115,8 +115,8 @@ public class Graf {
     }
 
     void addEdge(Node from, Node to) {
-        if(from == null) addNode(from);
-        if(to == null) addNode(to);
+        if(existsNode(from)) addNode(from);
+        if(existsNode(to)) addNode(to);
         edgeList.add(new Edge(from, to));
         if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
     }
@@ -242,12 +242,8 @@ public class Graf {
             }
             sa_list.add(0);
         }
-        sa_list.remove(sa_list.size() -1);
-        int[] sa_array = new int[sa_list.size()];
-        for (int i = 0; i < sa_array.length; i++) {
-            sa_array[i] = sa_list.get(i);
-        }
-        return sa_array;
+
+        return sa_list.stream().mapToInt(i->i).toArray();
     }
 
     public int[][] toAdjMatrix() {
@@ -383,6 +379,16 @@ public class Graf {
     public static void main(String[] args) {
         System.out.println(">>>>>>>> Creating the subject example graph in G");
         Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
+
+        System.out.println(">>>> Graph SA representation");
+        System.out.println(Arrays.toString(g.toSuccessorArray()));
+
+        System.out.println(">>>> Graph matrix representation");
+        int[][] matrix = g.toAdjMatrix();
+        for (int[] ints : matrix) {
+            System.out.println(Arrays.toString(ints));
+        }
+
         System.out.println(">>>> Graph information");
         System.out.println(">> DOT representation\n"+g.toDotString());
         System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
@@ -459,7 +465,6 @@ public class Graf {
         Collections.sort(nodes);
         System.out.println("Nodes list: "+nodes);
 
-        System.out.println("");
         System.out.println("\n>>>>>>>>  Edges removal");
         System.out.println(">>>> Removing existing edges (7, 3) and (4, 8)");
         g.removeEdge(7, 3);
@@ -514,7 +519,14 @@ public class Graf {
         System.out.println(">>>>>>>>>>    Transitive Closure");
         System.out.println(g.getTransitiveClosure().toDotString());
 
-        System.out.println(">>>>>>>>>>    Emptying the graph by removing all its nodes");
+        System.out.println("\n>>>> Testing incidentEdges");
+        System.out.println(g.getIncidentEdges(1));
+        System.out.println(g.getIncidentEdges(new Node(4)));
+
+        System.out.println("\n>>>> Get all edges");
+        System.out.println(g.getAllEdges());
+
+        System.out.println("\n>>>>>>>>>>    Emptying the graph by removing all its nodes");
         nodes = g.getAllNodes();
         for (Node u: nodes)
             g.removeNode(u);
@@ -527,7 +539,12 @@ public class Graf {
         else
             System.out.println("There is no Node 7");
 
-        System.out.println(">>>> Searching for edge (4, 2)");
+        if (g.existsNode(new Node(1)))
+            System.out.println("Node 1 exists");
+        else
+            System.out.println("There is no Node 1");
+
+        System.out.println("\n>>>> Searching for edge (4, 2)");
         if (g.existsEdge(4, 2))
             System.out.println("Edge (4, 2) exists");
         else
