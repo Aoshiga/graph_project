@@ -1,5 +1,7 @@
 package m1graf2020;
 
+import javax.swing.event.InternalFrameEvent;
+
 public class Node implements Comparable<Node>{
 
     private final int id;
@@ -17,13 +19,15 @@ public class Node implements Comparable<Node>{
     // Ne fonctionne pas
     @Override
     public boolean equals(Object obj) {
+        if(obj == this) return true;
+
         if (obj == null) return false;
 
         if( ! (obj instanceof Node) ) return false;
 
         Node other = (Node) obj;
 
-        return this.id == other.id;
+        return Integer.compare(this.id, other.id) == 0;
     }
 
     @Override

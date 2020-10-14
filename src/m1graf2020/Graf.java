@@ -37,12 +37,12 @@ public class Graf {
 
     public Node getNode(int id) {
         Node n = new Node(id);
-        if (adjList.containsKey(n)) return (Node) adjList.get(n);
+        if (adjList.containsKey(n)) return n;
         else return null;
     }
 
     public List<Node> getSuccessors(Node n) {
-        return getSuccessors(n.getId());
+        return adjList.get(n);
     }
 
     public List<Node> getSuccessors(int id) {
@@ -60,14 +60,21 @@ public class Graf {
     }
 
     public void removeNode(int id) {
-        adjList.remove(new Node(id));
-        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            entry.getValue().remove(new Node(id));
-        }
+        Set<Edge> toDelete = new HashSet<Edge>();
         for (Edge e : edgeList) {
             if (e.getTo().getId() == id || e.getFrom().getId() == id) {
-                removeEdge(e);
+                toDelete.add(e);
             }
+        }
+        //Must created a second iteration to avoid ConcurrentModificationException
+        for (Edge e : toDelete) {
+            removeEdge(e);
+        }
+
+        adjList.remove(new Node(id));
+
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            entry.getValue().remove(new Node(id));
         }
     }
 
@@ -90,23 +97,41 @@ public class Graf {
 
     public int nbEdges() { return edgeList.size(); }
 
-    public boolean existsEdge(Node u, Node v) { return adjacent(u, v); }
+    public boolean existsEdge(Node u, Node v) {
+        if (getNode(u.getId()) == null || getNode(v.getId()) == null) return false;
 
-    public boolean existsEdge(int u_id, int v_id) { return adjacent(u_id, v_id); }
+        return adjacent(u, v);
+    }
 
-    public boolean existsEdge(Edge e) { return edgeList.contains(e); }
+    public boolean existsEdge(int u_id, int v_id) {
+        if (getNode(u_id) == null || getNode(v_id) == null) return false;
+        return adjacent(u_id, v_id);
+    }
+
+    public boolean existsEdge(Edge e) {
+        if (getNode(e.getFrom().getId()) == null || getNode(e.getTo().getId()) == null) return false;
+
+        return edgeList.contains(e);
+    }
 
     void addEdge(Node from, Node to) {
+        if(from == null) addNode(from);
+        if(to == null) addNode(to);
         edgeList.add(new Edge(from, to));
         getSuccessors(from).add(to);
     }
 
     void addEdge(int from_id, int to_id) {
+        if(getNode(from_id) == null) addNode(from_id);
+        if(getNode(to_id) == null) addNode(to_id);
         edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
         getSuccessors(from_id).add(new Node(to_id));
     }
 
-    void addEdge(Edge e) {
+    void addEdge(Edge e)
+    {
+        if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
+        if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         edgeList.add(e);
         getSuccessors(e.getFrom()).add(e.getTo());
     }
@@ -117,12 +142,13 @@ public class Graf {
     }
 
     public void removeEdge(int from_id, int to_id) {
-        getSuccessors(from_id).remove(new Node(to_id));
-        edgeList.removeIf(e -> e.getFrom().getId() == from_id && e.getTo().getId() == to_id);
+        if (getNode(from_id) != null && getNode(to_id) != null) {
+            getSuccessors(from_id).remove(new Node(to_id));
+            edgeList.removeIf(e -> e.getFrom().getId() == from_id && e.getTo().getId() == to_id);
+        }
     }
 
     public void removeEdge(Edge e) {
-        System.out.println(getSuccessors(e.getFrom()));
         getSuccessors(e.getFrom()).remove(e.getTo());
         edgeList.remove(e);
     }
@@ -375,6 +401,7 @@ public class Graf {
         Collections.sort(nodes);
         System.out.println("Nodes list: "+nodes);
 
+        //// ----------------
         System.out.println("\n>>>>>>>> Removing node 3");
         g.removeNode(3);
         System.out.println("Graph now:");
@@ -401,8 +428,8 @@ public class Graf {
         }
 
         System.out.println("\n>>>>>>>> Recreating edges (4, 3), (3, 6), (7, 3), adding edge (12, 3), creating edge (3, 25)");
-        g.addEdge(new Edge(4, 3));
-        g.addEdge(new Edge(3, 6));
+        g.addEdge(4, 3);
+        g.addEdge(g.getNode(3), g.getNode(6));
         g.addEdge(new Edge(7, 3));
         g.addEdge(new Edge(12, 3));
         g.addEdge(3, 25);
@@ -422,8 +449,8 @@ public class Graf {
         g.removeEdge(3, 4);
         System.out.println(">>>> Removing edges whith 1 or 2 not existing end-points: (-3, 4), (6, 0), (4, 11), (-1, -2), (13, 3), (9, 10)");
         g.removeEdge(-3, 4);
-        g.removeEdge(6, 0);
-        g.removeEdge(4, 11);
+        g.removeEdge(new Edge(6, 0));
+        g.removeEdge(new Node(4), new Node(11));
         g.removeEdge(-1, -2);
         g.removeEdge(13, 3);
         g.removeEdge(9, 10);
@@ -486,5 +513,15 @@ public class Graf {
             System.out.println("Edge (4, 2) exists");
         else
             System.out.println("There is no edge (4, 2)");
+
+        if (g.existsEdge(new Node(1), new Node(2)))
+            System.out.println("Edge (1, 2) exists");
+        else
+            System.out.println("There is no edge (1, 2)");
+
+        if (g.existsEdge(new Edge(6, 7)))
+            System.out.println("Edge (6, 7) exists");
+        else
+            System.out.println("There is no edge (6, 7)");
     }
 }
