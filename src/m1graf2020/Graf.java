@@ -37,12 +37,12 @@ public class Graf {
 
     public Node getNode(int id) {
         Node n = new Node(id);
-        if (adjList.containsKey(n)) return (Node) adjList.get(n);
+        if (adjList.containsKey(n)) return n;
         else return null;
     }
 
     public List<Node> getSuccessors(Node n) {
-        return getSuccessors(n.getId());
+        return adjList.get(n);
     }
 
     public List<Node> getSuccessors(int id) {
@@ -60,14 +60,21 @@ public class Graf {
     }
 
     public void removeNode(int id) {
-        adjList.remove(new Node(id));
-        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            entry.getValue().remove(new Node(id));
-        }
+        Set<Edge> toDelete = new HashSet<Edge>();
         for (Edge e : edgeList) {
             if (e.getTo().getId() == id || e.getFrom().getId() == id) {
-                removeEdge(e);
+                toDelete.add(e);
             }
+        }
+        //Must created a second iteration to avoid ConcurrentModificationException
+        for (Edge e : toDelete) {
+            removeEdge(e);
+        }
+
+        adjList.remove(new Node(id));
+
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            entry.getValue().remove(new Node(id));
         }
     }
 
@@ -122,7 +129,6 @@ public class Graf {
     }
 
     public void removeEdge(Edge e) {
-        System.out.println(getSuccessors(e.getFrom()));
         getSuccessors(e.getFrom()).remove(e.getTo());
         edgeList.remove(e);
     }
@@ -294,6 +300,7 @@ public class Graf {
         Collections.sort(nodes);
         System.out.println("Nodes list: "+nodes);
 
+        //// ----------------
         System.out.println("\n>>>>>>>> Removing node 3");
         g.removeNode(3);
         System.out.println("Graph now:");
