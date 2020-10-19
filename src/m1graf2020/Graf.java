@@ -3,16 +3,19 @@ package m1graf2020;
 import java.util.*;
 
 public class Graf {
-    Map<Node, List<Node>> adjList;
+    //Map<Node, List<Node>> adjList;
+    TreeMap<Node, List<Node>> adjList;
     List<Edge> edgeList;
 
     Graf() {
-        adjList = new HashMap<>();
+        adjList = new TreeMap<>();
+        //adjList = new HashMap<>();
         edgeList = new ArrayList<>();
     }
 
     Graf(int ... sa) {
-        adjList = new HashMap<>();
+        adjList = new TreeMap<>();
+        //adjList = new HashMap<>();
         edgeList = new ArrayList<>();
         int from = 1;
         addNode(from);
@@ -359,9 +362,14 @@ public class Graf {
     }
 
     public String toDotString() {
+        //System.out.println("-----------   TEST    -----------");
+        //TreeMap<Node, List<Node>> sorted = new TreeMap<>(adjList);
+
         StringBuilder dot = new StringBuilder("digraph {\n");
+        //for (Map.Entry<Node, List<Node>> entry : sorted.entrySet()) {
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            dot.append("\t").append(entry.getKey().getId());
+
+                dot.append("\t").append(entry.getKey().getId());
             if(!entry.getValue().isEmpty()) dot.append(" -> ");
             Collections.sort(entry.getValue());
             for (Node n : entry.getValue()) {
