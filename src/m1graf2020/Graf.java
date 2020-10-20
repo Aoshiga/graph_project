@@ -1,6 +1,7 @@
 package m1graf2020;
 
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Graf {
     //Map<Node, List<Node>> adjList;
@@ -128,7 +129,7 @@ public class Graf {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
         edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
-        if (!getSuccessors(from_id).contains(to_id)) getSuccessors(from_id).add(new Node(to_id));
+        if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
     }
 
     void addEdge(Edge e)
@@ -297,33 +298,35 @@ public class Graf {
 
     public List<Node> getBFS() {
         List<Node> bfs = new ArrayList<>();
+        Map<Node, Integer> index = new HashMap<>();
         color[] color = new color[adjList.size()];
-        int[] distance = new int[adjList.size()];
-        Node[] parent = new Node[adjList.size()];
+
+        int cpt = 0;
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            for (Node n : entry.getValue()) {
-                color[n.getId()] = Graf.color.WHITE;
-                distance[n.getId()] = -1;
-                parent[n.getId()] = null;
-            }
+            index.put(entry.getKey(), cpt);
+            color[cpt] = Graf.color.WHITE;
+            cpt++;
         }
-        color[1] = Graf.color.GREY;
-        distance[1] = 0;
-        parent[1] = null;
-        Queue<Node> queue = new PriorityQueue<>();
+
+        color[0] = Graf.color.GREY;
+        //PriorityQueue doesn't conserve the order : use Linked instead
+        LinkedBlockingQueue<Node> queue = new LinkedBlockingQueue<>();
         queue.add(new Node(1));
+
         while (!queue.isEmpty()) {
             Node u = queue.poll();
-            for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-                if (color[entry.getKey().getId()] == Graf.color.WHITE) {
-                    color[entry.getKey().getId()] = Graf.color.GREY;
-                    distance[entry.getKey().getId()] = distance[u.getId()] +1;
-                    parent[entry.getKey().getId()] = u;
-                    queue.add(entry.getKey());
+            for (Node n : adjList.get(u)) {
+                if(adjacent(u, n)) {
+                    if (color[index.get(n)] == Graf.color.WHITE) {
+                        color[index.get(n)] = Graf.color.GREY;
+                        queue.add(n);
+                    }
                 }
             }
-            color[u.getId()] = Graf.color.BLACK;
+            color[index.get(u)] = Graf.color.BLACK;
+            bfs.add(u);
         }
+
         return bfs;
     }
 
@@ -362,7 +365,6 @@ public class Graf {
     }
 
     public String toDotString() {
-        //System.out.println("-----------   TEST    -----------");
         //TreeMap<Node, List<Node>> sorted = new TreeMap<>(adjList);
 
         StringBuilder dot = new StringBuilder("digraph {\n");
@@ -567,5 +569,12 @@ public class Graf {
             System.out.println("Edge (6, 7) exists");
         else
             System.out.println("There is no edge (6, 7)");
+
+        System.out.println(">>>> ----- New graph for bfs and dfs");
+        Graf g_bis = new Graf(2, 4, 0, 3, 1, 0, 1, 0, 4, 0);
+        System.out.println(">>>> Graph information");
+        System.out.println(">> DOT representation\n"+g_bis.toDotString());
+        List<Node> l_bfs = g_bis.getBFS();
+        System.out.println("bfs : " + Arrays.toString(l_bfs.toArray()));
     }
 }
