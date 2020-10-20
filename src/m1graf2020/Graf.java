@@ -315,12 +315,10 @@ public class Graf {
 
         while (!queue.isEmpty()) {
             Node u = queue.poll();
-            for (Node n : adjList.get(u)) {
-                if(adjacent(u, n)) {
-                    if (color[index.get(n)] == Graf.color.WHITE) {
-                        color[index.get(n)] = Graf.color.GREY;
-                        queue.add(n);
-                    }
+            for (Node n : getSuccessors(u)) {
+                if (color[index.get(n)] == Graf.color.WHITE) {
+                    color[index.get(n)] = Graf.color.GREY;
+                    queue.add(n);
                 }
             }
             color[index.get(u)] = Graf.color.BLACK;
@@ -332,36 +330,33 @@ public class Graf {
 
     public List<Node> getDFS() {
         List<Node> dfs = new ArrayList<>();
+        Map<Node, Integer> index = new HashMap<>();
         color[] color = new color[adjList.size()];
-        Node[] pi = new Node[adjList.size()];
-        int[] d = new int[adjList.size()];
-        int[] f = new int[adjList.size()];
+
+        int cpt = 0;
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            color[entry.getKey().getId()] = Graf.color.WHITE;
-            pi[entry.getKey().getId()] = null;
+            index.put(entry.getKey(), cpt);
+            color[cpt] = Graf.color.WHITE;
+            cpt++;
         }
-        int time = 0;
+
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            if (color[entry.getKey().getId()] == Graf.color.WHITE) {
-                dfs_visit(entry.getKey(), time, d, color, pi, f);
+            if (color[index.get(entry.getKey())] == Graf.color.WHITE) {
+                dfs_visit(dfs, entry.getKey(), color, index);
             }
         }
         return dfs;
     }
 
-    public void dfs_visit(Node u, int time, int[] d, color[] color, Node[] pi, int[] f) {
-        time = time + 1;
-        d[u.getId()] = time;
-        color[u.getId()] = Graf.color.GREY;
+    public void dfs_visit(List<Node> dfs, Node u, color[] color, Map<Node, Integer> index) {
+        color[index.get(u)] = Graf.color.GREY;
         for (Node v : getSuccessors(u)) {
-            if (color[v.getId()] == Graf.color.WHITE) {
-                pi[v.getId()] = u;
-                dfs_visit(v, time, d, color, pi, f);
+            if (color[index.get(v)] == Graf.color.WHITE) {
+                dfs_visit(dfs, v, color, index);
             }
         }
-        color[u.getId()] = Graf.color.BLACK;
-        time = time + 1;
-        f[u.getId()] = time;
+        color[index.get(u)] = Graf.color.BLACK;
+        dfs.add(u);
     }
 
     public String toDotString() {
@@ -570,11 +565,14 @@ public class Graf {
         else
             System.out.println("There is no edge (6, 7)");
 
-        System.out.println(">>>> ----- New graph for bfs and dfs");
+        System.out.println("\n>>>> ----- New graph for bfs and dfs");
         Graf g_bis = new Graf(2, 4, 0, 3, 1, 0, 1, 0, 4, 0);
         System.out.println(">>>> Graph information");
         System.out.println(">> DOT representation\n"+g_bis.toDotString());
         List<Node> l_bfs = g_bis.getBFS();
-        System.out.println("bfs : " + Arrays.toString(l_bfs.toArray()));
+        System.out.println("BFS : " + Arrays.toString(l_bfs.toArray()));
+
+        List<Node> l_dfs = g_bis.getDFS();
+        System.out.println("DFS : " + Arrays.toString(l_dfs.toArray()));
     }
 }
