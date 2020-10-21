@@ -1,5 +1,7 @@
 package m1graf2020;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -365,7 +367,6 @@ public class Graf {
         StringBuilder dot = new StringBuilder("digraph {\n");
         //for (Map.Entry<Node, List<Node>> entry : sorted.entrySet()) {
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-
                 dot.append("\t").append(entry.getKey().getId());
             if(!entry.getValue().isEmpty()) dot.append(" -> ");
             Collections.sort(entry.getValue());
@@ -379,6 +380,21 @@ public class Graf {
         }
         dot.append("}");
         return dot.toString();
+    }
+
+    void toDotFile(String fileName){
+        /* if filename is empty (""), give a default filename */
+        if(fileName.equals("")) fileName = "digraph";
+
+        try {
+            String dot = this.toDotString();
+            FileWriter fw = new FileWriter(fileName + ".dot");
+            fw.write(dot);
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -396,6 +412,7 @@ public class Graf {
 
         System.out.println(">>>> Graph information");
         System.out.println(">> DOT representation\n"+g.toDotString());
+        g.toDotFile("");
         System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
         System.out.println(">> Nodes: ");
         List<Node> nodes = g.getAllNodes();
@@ -574,5 +591,13 @@ public class Graf {
 
         List<Node> l_dfs = g_bis.getDFS();
         System.out.println("DFS : " + Arrays.toString(l_dfs.toArray()));
+
+
+
+        /* ------------------------------------------------- */
+        System.out.println(">>>>>>>> Creating un undirected graphs");
+        UndirectedGraf ug = new UndirectedGraf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
+        System.out.println(">> DOT representation\n"+ug.toDotString());
+        ug.toDotFile("UndirectedGraph");
     }
 }
