@@ -15,6 +15,14 @@ public class UndirectedGraf extends Graf{
 
     UndirectedGraf(int ... sa) {
         super(sa);
+
+        int from = 1;
+        for (int i = 0; i < sa.length; i++)  {
+            if (i == sa.length -1) break;
+            if (sa[i] != 0) {
+                if(!adjList.get(new Node(sa[i])).contains(new Node(from))) adjList.get(new Node(sa[i])).add(new Node(from));
+            } else ++from;
+        }
     }
 
     public String toDotString() {
