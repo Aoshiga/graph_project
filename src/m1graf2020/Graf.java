@@ -134,8 +134,7 @@ public class Graf {
         if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
     }
 
-    void addEdge(Edge e)
-    {
+    void addEdge(Edge e) {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         edgeList.add(e);
@@ -398,7 +397,253 @@ public class Graf {
     }
 
     public static void main(String[] args) {
-        System.out.println(">>>>>>>> Creating the subject example graph in G");
+
+        boolean stop = false;
+        Map<String, Graf> grafCreate = new HashMap<>();
+        String grafName;
+
+        Scanner reader = new Scanner(System.in);  // Reading from System.in
+
+        //reader.close();
+
+        while(!stop) {
+            System.out.println("Enter the number of the instruction you want to follow: ");
+            System.out.println("1 : Create a graph");
+            System.out.println("2 : Modify an existing graph");
+            System.out.println("3 : Get information about a graph");
+            System.out.println("4 : Print a graf");
+            System.out.println("10 : Quit the application");
+
+            int n = reader.nextInt();
+
+            switch (n) {
+                case 1 :
+                    System.out.println("Choose a kind of graph:");
+                    System.out.println("1 : Empty graph");
+                    System.out.println("2 : Random graph");
+                    System.out.println("3 : Return to main menu");
+                    int kindOfGraf = reader.nextInt();
+                    while(!stop) {
+                        stop=true;
+                        switch (kindOfGraf) {
+                            case 1:
+                                System.out.println("Give the graf name:");
+                                grafName = reader.next();
+                                grafCreate.put(grafName, new Graf());
+                                break;
+                            case 2:
+                                System.out.println("Give the graf name:");
+                                grafName = reader.next();
+                                System.out.println("Give the number of edges:");
+                                int nbrOfEdges = reader.nextInt();
+                                List<Integer> sa = new ArrayList<>();
+                                int rand;
+                                for (int i = 0; i < nbrOfEdges; ++i) {
+                                    rand = 1 + (int) (Math.random() * ((nbrOfEdges - 1) + 1));
+                                    for (int j = 1; j < rand; j++) {
+                                        sa.add(1 + (int) (Math.random() * ((nbrOfEdges - 1) + 1)));
+                                    }
+                                    sa.add(0);
+                                }
+                                int[] array = sa.stream().mapToInt(i -> i).toArray();
+                                grafCreate.put(grafName, new Graf(array));
+                                break;
+
+                            case 3:
+                                break;
+
+                            default:
+                                System.out.println("Unknown command, enter a valid command : ");
+                                //stop=false;
+                                break;
+                        }
+                    }
+                    stop = false;
+                    break;
+
+                case 2 :
+                    System.out.println("Enter the name of the graf you want to modify:");
+                    grafName = reader.next();
+                    if(!grafCreate.containsKey(grafName)){
+                        System.out.println("This graf doesn't exist. Return to main menu.");
+                        stop = true;
+                        break;
+                    }
+
+                    while (!stop) {
+                        System.out.println("What you want to do:");
+                        System.out.println("1 : Add a node");
+                        System.out.println("2 : Remove a node");
+                        System.out.println("3 : Add an edge");
+                        System.out.println("4 : Remove an edge");
+                        System.out.println("5 : Return to main menu");
+                        int grafToModify = reader.nextInt();
+                        int from;
+
+                        switch (grafToModify) {
+                            case 1:
+                                System.out.println("Enter the node number. Be careful, if the node already exist, it will be erase and replace!");
+                                grafCreate.get(grafName).addNode(reader.nextInt());
+                                break;
+                            case 2:
+                                System.out.println("Enter the number of the node. This action is irreversible!");
+                                grafCreate.get(grafName).removeNode(reader.nextInt());
+                                break;
+                            case 3:
+                                System.out.println("Enter the first node:");
+                                from = reader.nextInt();
+                                System.out.println("Enter the second node:");
+                                grafCreate.get(grafName).addEdge(from, reader.nextInt());
+                                break;
+                            case 4:
+                                System.out.println("Enter the first node:");
+                                from = reader.nextInt();
+                                System.out.println("Enter the second node:");
+                                grafCreate.get(grafName).removeEdge(from, reader.nextInt());
+                                break;
+                            case 5:
+                                stop = true;
+                                break;
+                            default:
+                                System.out.println("Unknown command, enter a valid command : ");
+                                break;
+                        }
+                        System.out.println();
+                    }
+                    stop = false;
+                    break;
+
+                case 3 :
+                    System.out.println("Enter the name of the graf you want to modify:");
+                    grafName = reader.next();
+                    if(!grafCreate.containsKey(grafName)){
+                        System.out.println("This graf doesn't exist. Return to main menu.");
+                        stop = true;
+                        break;
+                    }
+
+                    while (!stop) {
+                        System.out.println("What you want to do:");
+                        System.out.println("1 : Get the number of nodes");
+                        System.out.println("2 : Get all nodes (list)");
+                        System.out.println("3 : Get successor (list)");
+                        System.out.println("4 : Check if a node exist");
+                        System.out.println("5 : Check if two nodes are adjacent");
+                        System.out.println("6 : Get the number of edges");
+                        System.out.println("7 : Get all edges (list)");
+                        System.out.println("8 : Check if an edge exist");
+                        System.out.println("9 : Get the list of all edges leaving node");
+                        System.out.println("10 : Get the list of all edges entering node");
+                        System.out.println("11 : Get incident edges. This is the union of the out and in edge");
+                        System.out.println("12 : For knowing the in-degree of node");
+                        System.out.println("13 : For knowing the out-degree of node");
+                        System.out.println("14 : For knowing the degree of node");
+                        System.out.println("15 : Return to main menu");
+
+                        int grafToModify = reader.nextInt();
+                        int node;
+
+                        switch (grafToModify) {
+                            case 1:
+                                System.out.println("Graf " + grafName + " has " + grafCreate.get(grafName).nbNodes() + " node(s).");
+                                break;
+                            case 2:
+                                System.out.println("Nodes of graf " + grafName + ":");
+                                System.out.println(grafCreate.get(grafName).getAllNodes());
+                                break;
+                            case 3:
+                                System.out.println("Enter a node number:");
+                                node = reader.nextInt();
+                                System.out.println("Successor of node " + node + ":");
+                                System.out.println(grafCreate.get(grafName).getSuccessors(node));
+                                break;
+                            case 4:
+                                System.out.println("Enter a node number:");
+                                if(grafCreate.get(grafName).existsNode(reader.nextInt())) System.out.println("Node exist");
+                                else System.out.println("Node doesn't exist");
+                                break;
+                            case 5:
+                                System.out.println("Number of the first node:");
+                                node = reader.nextInt();
+                                System.out.println("Number of the second node:");
+                                if(grafCreate.get(grafName).adjacent(node, reader.nextInt())) System.out.println("Node are adjacent");
+                                else System.out.println("Node are not adjacent");
+                            case 6:
+                                System.out.println("Graf " + grafName + " has " + grafCreate.get(grafName).nbEdges() + " edges");
+                                break;
+                            case 7:
+                                System.out.println("Nodes of graf " + grafName + ":");
+                                System.out.println(grafCreate.get(grafName).getAllEdges());
+                                break;
+                            case 8:
+                                System.out.println("Number of the first node:");
+                                node = reader.nextInt();
+                                System.out.println("Number of the second node:");
+                                if(grafCreate.get(grafName).existsEdge(node, reader.nextInt())) System.out.println("Edge exist");
+                                else System.out.println("Edge doesn't exist");
+                                break;
+                            case 9:
+                                System.out.println("Enter a node number:");
+                                System.out.println("The out-edges are : " + grafCreate.get(grafName).getOutEdges(reader.nextInt()));
+                                break;
+                            case 10:
+                                System.out.println("Enter a node number:");
+                                System.out.println("The in-edges are : " + grafCreate.get(grafName).getInEdges(reader.nextInt()));
+                                break;
+                            case 11:
+                                System.out.println("Enter a node number:");
+                                System.out.println("The incident edge are: " + grafCreate.get(grafName).getIncidentEdges(reader.nextInt()));
+                                break;
+                            case 12:
+                                System.out.println("Enter a node number:");
+                                node = reader.nextInt();
+                                System.out.println("The in-degree of node: " + node + "is:" + grafCreate.get(grafName).inDegree(node));
+                                break;
+                            case 13:
+                                System.out.println("Enter a node number:");
+                                node = reader.nextInt();
+                                System.out.println("The out-degree of node: " + node + "is:" + grafCreate.get(grafName).outDegree(node));
+                                break;
+                            case 14:
+                                System.out.println("Enter a node number:");
+                                node = reader.nextInt();
+                                System.out.println("The degree of node: " + node + "is:" + grafCreate.get(grafName).degree(node));
+                                break;
+                            case 15:
+                                stop = true;
+                                break;
+                            default:
+                                System.out.println("Unknown command, enter a valid command : ");
+                                break;
+                        }
+
+                        System.out.println();
+                    }
+                    stop = false;
+                    break;
+
+                case 4:
+                    System.out.println("Enter the name of the graf you want to print:");
+                    grafName = reader.next();
+                    System.out.println("Show the graph in the DOT file (1) or export the graph to a DOT file (2)");
+                    if(reader.nextInt() == 1) System.out.println(grafCreate.get(grafName).toDotString());
+                    else if(reader.nextInt() == 2) {
+                        System.out.println("Enter a file name:");
+                        grafCreate.get(grafName).toDotFile(reader.next());
+                    } else System.out.println("Unknown command, return to main menu");
+                    break;
+
+                case 10 :
+                    System.out.println("Goodbye!");
+                    stop = true;
+                    break;
+
+                default:
+                    System.out.println("Unknown command, try again :");
+            }
+        }
+
+        /*System.out.println(">>>>>>>> Creating the subject example graph in G");
         Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
 
         System.out.println(">>>> Graph SA representation");
@@ -594,10 +839,10 @@ public class Graf {
 
 
 
-        /* ------------------------------------------------- */
+        // -------------------------------------------------
         System.out.println(">>>>>>>> Creating un undirected graphs");
         UndirectedGraf ug = new UndirectedGraf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
         System.out.println(">> DOT representation\n"+ug.toDotString());
-        ug.toDotFile("UndirectedGraph");
+        ug.toDotFile("UndirectedGraph");*/
     }
 }

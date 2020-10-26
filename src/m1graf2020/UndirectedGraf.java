@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Use inEdge and outEdge
+ */
 public class UndirectedGraf extends Graf{
 
     UndirectedGraf() {
