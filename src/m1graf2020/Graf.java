@@ -1,7 +1,6 @@
 package m1graf2020;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -124,21 +123,21 @@ public class Graf {
     void addEdge(Node from, Node to) {
         if(existsNode(from)) addNode(from);
         if(existsNode(to)) addNode(to);
-        edgeList.add(new Edge(from, to));
+        if(!edgeList.contains(new Edge(from, to))) edgeList.add(new Edge(from, to));
         if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
     }
 
     void addEdge(int from_id, int to_id) {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
-        edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
+        if(!edgeList.contains(new Edge(from_id, to_id))) edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
         if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
     }
 
     void addEdge(Edge e) {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
-        edgeList.add(e);
+        if(!edgeList.contains(e)) edgeList.add(e);
         getSuccessors(e.getFrom()).add(e.getTo());
     }
 
@@ -283,13 +282,26 @@ public class Graf {
     }
 
     public Graf getTransitiveClosure() {
-        Graf g = this;
+        /*Graf g = this;
         Graf reverse = getReverse();
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
             List<Node> predecessors = reverse.getSuccessors(entry.getKey());
             for (Node p : predecessors) {
                 for (Node s : entry.getValue()) {
                     g.addEdge(p, s);
+                }
+            }
+        }
+        return g;*/
+        Graf g = this;
+        int nbNodes = nbNodes();
+
+        for(int i=1; i<=nbNodes; ++i) {
+            for (int j = 1; j <= nbNodes; ++j) {
+                for (int k = 1; k <= nbNodes; ++k) {
+                    if (edgeList.contains(new Edge(i, j)) || (edgeList.contains(new Edge(i, k)) && edgeList.contains(new Edge(k, j)))) {
+                        g.addEdge(i, j);
+                    }
                 }
             }
         }
@@ -429,11 +441,13 @@ public class Graf {
                 case 1 :
                     System.out.println("Choose a kind of graph:");
                     System.out.println("1 : Empty graph");
-                    System.out.println("2 : Random graph");
-                    System.out.println("3 : Return to main menu");
+                    System.out.println("2 : From SA");
+                    System.out.println("3 : Random graph");
+                    System.out.println("4 : Return to main menu");
                     int kindOfGraf = reader.nextInt();
                     while(!stop) {
                         stop=true;
+                        List<Integer> sa = new ArrayList<>();
                         switch (kindOfGraf) {
                             case 1:
                                 System.out.println("Give the graph name:");
@@ -450,9 +464,24 @@ public class Graf {
                             case 2:
                                 System.out.println("Give the graph name:");
                                 grafName = reader.next();
+
+                                System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
+                                n = reader.nextInt();
+
+                                System.out.println("Give sa in following format : [x, x, x]");
+                                //String[] s = reader.next().split(", ");
+
+                                //if(n == 1)grafCreate.put(grafName, new Graf());
+                                //else if(n == 2) grafCreate.put(grafName, new UndirectedGraf());
+                                //else System.out.println("Unknown command : graph not created:");
+
+                                break;
+
+                            case 3:
+                                System.out.println("Give the graph name:");
+                                grafName = reader.next();
                                 System.out.println("Give the number of edges:");
                                 int nbrOfEdges = reader.nextInt();
-                                List<Integer> sa = new ArrayList<>();
                                 List<Integer> sa_edge = new ArrayList<>(); //eliminate double
                                 int rand;
                                 int rand_edge;
@@ -476,7 +505,7 @@ public class Graf {
 
                                 break;
 
-                            case 3:
+                            case 4:
                                 break;
 
                             default:
@@ -592,8 +621,9 @@ public class Graf {
                                 System.out.println("Number of the first node:");
                                 node = reader.nextInt();
                                 System.out.println("Number of the second node:");
-                                if(grafCreate.get(grafName).adjacent(node, reader.nextInt())) System.out.println("Node are adjacent");
-                                else System.out.println("Node are not adjacent");
+                                if(grafCreate.get(grafName).adjacent(node, reader.nextInt())) System.out.println("Nodes are adjacent");
+                                else System.out.println("Nodes are not adjacent");
+                                break;
                             case 6:
                                 System.out.println("Graph " + grafName + " has " + grafCreate.get(grafName).nbEdges() + " edges");
                                 break;

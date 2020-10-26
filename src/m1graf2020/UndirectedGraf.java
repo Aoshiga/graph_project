@@ -25,16 +25,110 @@ public class UndirectedGraf extends Graf{
         }
     }
 
+    void addEdge(Node from, Node to) {
+        if(existsNode(from)) addNode(from);
+        if(existsNode(to)) addNode(to);
+        if(!edgeList.contains(new Edge(from, to)) || !edgeList.contains(new Edge(to, from))) edgeList.add(new Edge(from, to));
+        if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
+    }
+
+    void addEdge(int from_id, int to_id) {
+        if(getNode(from_id) == null) addNode(from_id);
+        if(getNode(to_id) == null) addNode(to_id);
+        if(!edgeList.contains(new Edge(from_id, to_id)) || !edgeList.contains(new Edge(to_id, from_id))) edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
+        if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
+    }
+
+    void addEdge(Edge e) {
+        if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
+        if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
+        if(!edgeList.contains(e) || !edgeList.contains(new Edge(e.getTo(), e.getFrom()))) edgeList.add(e);
+        getSuccessors(e.getFrom()).add(e.getTo());
+    }
+
+    public List<Edge> getOutEdges(Node n) {
+        return getIncidentEdges(n);
+    }
+
+    public List<Edge> getOutEdges(int id) {
+        return getIncidentEdges(id);
+    }
+
+    public List<Edge> getInEdges(Node n) {
+        return getIncidentEdges(n);
+    }
+
+    public List<Edge> getInEdges(int id) {
+        return getIncidentEdges(id);
+    }
+
+    public List<Edge> getIncidentEdges(Node n) {
+        return getIncidentEdges(n.getId());
+    }
+
+    public List<Edge> getIncidentEdges(int id) {
+        List<Edge> incidentEdges = new ArrayList<>();
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == id || e.getFrom().getId() == id) {
+                incidentEdges.add(e);
+            }
+        }
+        return incidentEdges;
+    }
+
+    public int inDegree(Node n) {
+        return getSuccessors(n).size();
+    }
+
+    public int inDegree(int id) {
+        return getSuccessors(id).size();
+    }
+
+    public int degree(Node n) {
+        return getSuccessors(n).size();
+    }
+
+    public int degree(int id) {
+        return getSuccessors(id).size();
+    }
+
+    public UndirectedGraf getReverse() {
+        return this;
+    }
+
+    public UndirectedGraf getTransitiveClosure() {
+        UndirectedGraf g = this;
+        UndirectedGraf reverse = getReverse();
+        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+            List<Node> predecessors = reverse.getSuccessors(entry.getKey());
+            for (Node p : predecessors) {
+                for (Node s : entry.getValue()) {
+                    g.addEdge(p, s);
+                }
+            }
+        }
+        return g;
+    }
+    // TO DO : getTransitive
+
     public String toDotString() {
         StringBuilder dot = new StringBuilder("graph {\n");
+        boolean once = true;
 
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
             dot.append("\t").append(entry.getKey().getId());
-            if(!entry.getValue().isEmpty()) dot.append(" -- ");
             Collections.sort(entry.getValue());
+
             for (Node n : entry.getValue()) {
-                dot.append(n.getId()).append(", ");
+                if(!(n.getId() < entry.getKey().getId())){
+                    if(!entry.getValue().isEmpty() && once){
+                        dot.append(" -- ");
+                        once = false;
+                    }
+                    dot.append(n.getId()).append(", ");
+                }
             }
+            once = true;
             if (dot.charAt(dot.length() -1) == ' ') {
                 dot.setLength(dot.length() -2);
             }
