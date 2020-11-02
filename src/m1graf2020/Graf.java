@@ -1,5 +1,7 @@
 package m1graf2020;
 
+import sun.security.x509.UniqueIdentity;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,6 +31,34 @@ public class Graf {
                 edgeList.add(new Edge(new Node(from), new Node(sa[i])));
             } else {
                 addNode(++from);
+            }
+        }
+    }
+
+    Graf(File file) throws IOException {
+        String extension = "";
+        int i = file.getName().lastIndexOf('.');
+        if (i > 0) {
+            extension = file.getName().substring(i+1);
+        }
+        if (!extension.equals("dot")) throw new IOException("File is not .dot");
+        adjList = new TreeMap<>();
+        edgeList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        reader.readLine();
+        String line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            if (line.contains("}")) break;
+            else {
+                int node_id = Integer.parseInt(String.valueOf(line.charAt(1)));
+                addNode(node_id);
+                int index = 6;
+                while (index < line.length()) {
+                    addEdge(node_id, Integer.parseInt(String.valueOf(line.charAt(index))));
+                    index += 3;
+                }
+                line = reader.readLine();
             }
         }
     }
@@ -409,7 +439,11 @@ public class Graf {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        /*File test = new File(Graf.class.getResource("test.dot").getFile());
+        UndirectedGraf g = new UndirectedGraf(test);
+        System.out.println(g.toDotString());*/
 
         boolean stop = false;
         Map<String, Graf> grafCreate = new HashMap<>();
@@ -756,6 +790,10 @@ public class Graf {
                     System.out.println("Unknown command, try again :");
             }
         }
+
+
+
+
 
         /*System.out.println(">>>>>>>> Creating the subject example graph in G");
         Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);

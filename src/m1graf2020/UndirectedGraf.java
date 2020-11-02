@@ -1,7 +1,6 @@
 package m1graf2020;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -22,6 +21,34 @@ public class UndirectedGraf extends Graf{
             if (sa[i] != 0) {
                 if(!adjList.get(new Node(sa[i])).contains(new Node(from))) adjList.get(new Node(sa[i])).add(new Node(from));
             } else ++from;
+        }
+    }
+
+    UndirectedGraf(File file) throws IOException {
+        String extension = "";
+        int i = file.getName().lastIndexOf('.');
+        if (i > 0) {
+            extension = file.getName().substring(i+1);
+        }
+        if (!extension.equals("dot")) throw new IOException("File is not .dot");
+        adjList = new TreeMap<>();
+        edgeList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        reader.readLine();
+        String line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            if (line.contains("}")) break;
+            else {
+                int node_id = Integer.parseInt(String.valueOf(line.charAt(1)));
+                addNode(node_id);
+                int index = 6;
+                while (index < line.length()) {
+                    addEdge(node_id, Integer.parseInt(String.valueOf(line.charAt(index))));
+                    index += 3;
+                }
+                line = reader.readLine();
+            }
         }
     }
 
