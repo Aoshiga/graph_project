@@ -75,14 +75,22 @@ public class Edge implements Comparable<Edge> {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof Edge)) return false;
-        Edge e = (Edge) o;
-        return from.getId() == e.from.getId() && to.getId() == e.to.getId();
+        //if (o == this) return true;
+        if (o instanceof Edge) {
+            Edge toCompare = (Edge) o;
+            return this.from.equals(toCompare.from) && this.to.equals(toCompare.to);
+            //return this.from.getId() == toCompare.from.getId() && this.to.getId() == toCompare.to.getId();
+        }
+        return false;
     }
 
     @Override
     public String toString() {
         return from + "->" + to;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.from.hashCode() * this.to.hashCode();
     }
 }
