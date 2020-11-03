@@ -1,7 +1,5 @@
 package m1graf2020;
 
-import javax.swing.event.InternalFrameEvent;
-
 public class Node implements Comparable<Node>{
 
     private final int id;

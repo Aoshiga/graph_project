@@ -12,6 +12,10 @@ public class UndirectedGraf extends Graf{
         super();
     }
 
+    /**
+     * Builds an undirected graph from an int array representing a Successor Array Formalism
+     * @param sa an int array in the Successor Array formalism
+     */
     UndirectedGraf(int ... sa) {
         super(sa);
 
@@ -24,6 +28,11 @@ public class UndirectedGraf extends Graf{
         }
     }
 
+    /**
+     * Builds an undirected graph from a Dot file
+     * @param file file to be read, must be .dot file
+     * @throws IOException if the file was not found or if it is not .dot
+     */
     UndirectedGraf(File file) throws IOException {
         String extension = "";
         int i = file.getName().lastIndexOf('.');
@@ -37,7 +46,6 @@ public class UndirectedGraf extends Graf{
         reader.readLine();
         String line = reader.readLine();
         while (line != null) {
-            System.out.println(line);
             if (line.contains("}")) break;
             else {
                 int node_id = Integer.parseInt(String.valueOf(line.charAt(1)));
@@ -52,6 +60,11 @@ public class UndirectedGraf extends Graf{
         }
     }
 
+    /**
+     * Adds an edge fromm one node to another, adds the nodes to the graph if needed
+     * @param from a node
+     * @param to another node
+     */
     void addEdge(Node from, Node to) {
         if(!existsNode(from)) addNode(from);
         if(!existsNode(to)) addNode(to);
@@ -59,6 +72,11 @@ public class UndirectedGraf extends Graf{
         if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
     }
 
+    /**
+     * Adds an edge fromm one node to another, adds the nodes to the graph if needed
+     * @param from_id int id representing a node
+     * @param to_id int id representing another node
+     */
     void addEdge(int from_id, int to_id) {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
@@ -66,6 +84,10 @@ public class UndirectedGraf extends Graf{
         if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
     }
 
+    /**
+     * Adds an edge fromm one node to another, adds the nodes to the graph if needed
+     * @param e edge to be added
+     */
     void addEdge(Edge e) {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
@@ -73,26 +95,56 @@ public class UndirectedGraf extends Graf{
         getSuccessors(e.getFrom()).add(e.getTo());
     }
 
+    /**
+     * Gets a list of all the edges leaving a node in the graph
+     * @param n a node in the graph
+     * @return the list of all the edges leaving the node
+     */
     public List<Edge> getOutEdges(Node n) {
         return getIncidentEdges(n);
     }
 
+    /**
+     * Gets a list of all the edges leaving a node in the graph
+     * @param id int id representing a node in the graph
+     * @return the list of all the edges leaving the node
+     */
     public List<Edge> getOutEdges(int id) {
         return getIncidentEdges(id);
     }
 
+    /**
+     * Gets a list of all the edges coming to a node in the graph
+     * @param n a node in the graph
+     * @return the list of all the edges coming to the node
+     */
     public List<Edge> getInEdges(Node n) {
         return getIncidentEdges(n);
     }
 
+    /**
+     * Gets a list of all the edges coming to a node in the graph
+     * @param id int id representing a node in the graph
+     * @return the list of all the edges coming to the node
+     */
     public List<Edge> getInEdges(int id) {
         return getIncidentEdges(id);
     }
 
+    /**
+     * Gets a list of all the edges leaving and coming to a node in the graph
+     * @param n a node in the graph
+     * @return the list of all the edges leaving and coming to the node
+     */
     public List<Edge> getIncidentEdges(Node n) {
         return getIncidentEdges(n.getId());
     }
 
+    /**
+     * Gets a list of all the edges leaving and coming to a node in the graph
+     * @param id int id representing a node in the graph
+     * @return the list of all the edges leaving and coming to the node
+     */
     public List<Edge> getIncidentEdges(int id) {
         List<Edge> incidentEdges = new ArrayList<>();
         for (Edge e : edgeList) {
@@ -103,22 +155,46 @@ public class UndirectedGraf extends Graf{
         return incidentEdges;
     }
 
+    /**
+     * Gets the number of edges coming to a node
+     * @param n a node
+     * @return an int representing the number of edges coming to a node
+     */
     public int inDegree(Node n) {
         return getSuccessors(n).size();
     }
 
+    /**
+     * Gets the number of edges coming to a node
+     * @param id int id representing a node
+     * @return an int representing the number of edges coming to a node
+     */
     public int inDegree(int id) {
         return getSuccessors(id).size();
     }
 
+    /**
+     * Gets the number of edges both leaving and coming to a node
+     * @param n a node
+     * @return an int representing the number of edges both leaving and coming to a node
+     */
     public int degree(Node n) {
         return getSuccessors(n).size();
     }
 
+    /**
+     * Gets the number of edges both leaving and coming to a node
+     * @param id int id representing a node
+     * @return an int representing the number of edges both leaving and coming to a node
+     */
     public int degree(int id) {
         return getSuccessors(id).size();
     }
 
+    /**
+     * Builds a two-dimensional int array representing the graph in the adjacency matrix formalism, reversed
+     * @return a two-dimensional int array representing the graph in the adjacency matrix formalism, reversed
+     */
     public UndirectedGraf getReverse() {
         return this;
     }
@@ -138,6 +214,10 @@ public class UndirectedGraf extends Graf{
     }
     // TO DO : getTransitive
 
+    /**
+     * Returns a String representing the graph in the DOT formalism
+     * @return a String representing the graph in the DOT formalism
+     */
     public String toDotString() {
         StringBuilder dot = new StringBuilder("graph {\n");
         boolean once = true;
@@ -165,6 +245,9 @@ public class UndirectedGraf extends Graf{
         return dot.toString();
     }
 
+    /**
+     * Exports the graph in a .dot file in the DOT formalism
+     */
     void toDotFile(String fileName){
         //if filename is empty (""), give a default filename
         if(fileName.equals("")) fileName = "graph";
