@@ -70,6 +70,8 @@ public class UndirectedGraf extends Graf{
         if(!existsNode(to)) addNode(to);
         if(!edgeList.contains(new Edge(from, to)) && !edgeList.contains(new Edge(to, from))) edgeList.add(new Edge(from, to));
         if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
+
+        if(!getSuccessors(to).contains(from)) getSuccessors(to).add(from);
     }
 
     /**
@@ -82,6 +84,8 @@ public class UndirectedGraf extends Graf{
         if(getNode(to_id) == null) addNode(to_id);
         if(!edgeList.contains(new Edge(from_id, to_id)) && !edgeList.contains(new Edge(to_id, from_id))) edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
         if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
+
+        if(!getSuccessors(to_id).contains(new Node(from_id))) getSuccessors(to_id).add(new Node(from_id));
     }
 
     /**
@@ -92,7 +96,9 @@ public class UndirectedGraf extends Graf{
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         if(!edgeList.contains(e) && !edgeList.contains(new Edge(e.getTo(), e.getFrom()))) edgeList.add(e);
-        getSuccessors(e.getFrom()).add(e.getTo());
+        if(!getSuccessors(e.getFrom()).contains(e.getTo())) getSuccessors(e.getFrom()).add(e.getTo());
+
+        if(!getSuccessors(e.getTo()).contains(e.getFrom())) getSuccessors(e.getTo()).add(e.getFrom());
     }
 
     /**

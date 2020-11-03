@@ -15,7 +15,6 @@ public class Graf {
 
     Graf() {
         adjList = new TreeMap<>();
-        //adjList = new HashMap<>();
         edgeList = new ArrayList<>();
     }
 
@@ -25,7 +24,6 @@ public class Graf {
      */
     Graf(int ... sa) {
         adjList = new TreeMap<>();
-        //adjList = new HashMap<>();
         edgeList = new ArrayList<>();
         int from = 1;
         addNode(from);
@@ -33,7 +31,7 @@ public class Graf {
             if (i == sa.length -1) break;
             if (sa[i] != 0) {
                 //if(!getSuccessors(from).contains(new Node(sa[i]))) getSuccessors(from).add(new Node(sa[i]));
-                if(!adjList.get(new Node(from)).contains(new Node(sa[i]))) adjList.get(new Node(from)).add(new Node(sa[i]));
+                //if(!adjList.get(new Node(from)).contains(new Node(sa[i]))) adjList.get(new Node(from)).add(new Node(sa[i]));
                 //edgeList.add(new Edge(new Node(from), new Node(sa[i])));
                 addEdge(from, sa[i]);
             } else {
@@ -275,7 +273,7 @@ public class Graf {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         if(!edgeList.contains(e)) edgeList.add(e);
-        getSuccessors(e.getFrom()).add(e.getTo());
+        if (!getSuccessors(e.getFrom()).contains(e.getTo())) getSuccessors(e.getFrom()).add(e.getTo());
     }
 
     /**
@@ -724,12 +722,13 @@ public class Graf {
                         System.out.println("6 : Random dense graph");
                         System.out.println("7 : Random sparse graph");
                         System.out.println("8 : Random parametrized graph");
+                        System.out.println("9 : Random directed acyclic graph");
 
                         int kindOfGraf = reader.nextInt();
                         while (!stop) {
                             stop = true;
 
-                            /* Definition of variable use in the switch */
+                            // Definition of variable use in the switch
                             List<Integer> sa = new ArrayList<>();
                             int nbrOfVertices;
                             int nbrOfEdges;
@@ -904,26 +903,61 @@ public class Graf {
                                 case 8:
                                     System.out.println("Give the graph name:");
                                     grafName = reader.next();
-                                    System.out.println("Give the number of vertices:");
-                                    nbrOfVertices = reader.nextInt();
-                                    System.out.println("Give the number of edges:");
-                                    nbrOfEdges = reader.nextInt();
-                                    int cptEdges = 0;
 
                                     System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
                                     n = reader.nextInt();
-                                    sa_edge.clear();
+                                    if (n == 1) grafCreate.put(grafName, new Graf());
+                                    else if (n == 2) grafCreate.put(grafName, new UndirectedGraf());
+                                    else System.out.println("Unknown command : graph not created:");
 
-                                    for (int i = 0; i < nbrOfVertices; ++i) {
-                                        rand = (new Random()).nextInt(nbrOfVertices) + 1;
-                                        if(cptEdges < nbrOfEdges) {
-                                            for (int j = 1; j <= rand; j++) {
-                                                rand_edge = (new Random()).nextInt(nbrOfVertices) + 1;
-                                                if (!sa_edge.contains(rand_edge) && cptEdges < nbrOfEdges) {
-                                                    sa_edge.add(rand_edge);
-                                                    cptEdges++;
-                                                } else --j;
-                                            }
+                                    System.out.println("Give the number of vertices:");
+                                    nbrOfVertices = reader.nextInt();
+                                    int maxEdges;
+                                    if(n==1) maxEdges = nbrOfVertices*nbrOfVertices;
+                                    else maxEdges =  nbrOfVertices*(nbrOfVertices+1)/2;
+
+                                    System.out.println("Give the number of edges (maximum " + maxEdges + "):");
+                                    nbrOfEdges = reader.nextInt();
+
+                                    if(nbrOfEdges > maxEdges) {
+                                        System.out.println("The number of edges is greater than the maximum");
+                                        System.out.println("Graph creation aborted, return to main menu");
+                                        break;
+                                    }
+
+                                    for (int i = 1; i <= nbrOfVertices; ++i) {
+                                        grafCreate.get(grafName).addNode(i);
+                                    }
+
+                                    int cptEdges = 0;
+                                    int rand1;
+                                    int rand2;
+                                    while(cptEdges < nbrOfEdges) {
+                                        rand1 = (new Random()).nextInt(nbrOfVertices) + 1;
+                                        rand2 = (new Random()).nextInt(nbrOfVertices) + 1;
+                                        System.out.println(rand1 + " | " + rand2);
+                                        if(grafCreate.get(grafName).existsEdge(rand1, rand2)) cptEdges--;
+                                        else grafCreate.get(grafName).addEdge(rand1, rand2);
+                                        cptEdges++;
+                                    }
+
+                                    break;
+
+                                case 9:
+                                    System.out.println("Give the graph name:");
+                                    grafName = reader.next();
+
+                                    sa_edge.clear();
+                                    max = 30;
+                                    min = 0;
+                                    nbrOfVertices = (new Random()).nextInt(max - min + 1) + min;
+
+                                    for (int i = 1; i < nbrOfVertices; ++i) {
+                                        rand = (new Random()).nextInt((nbrOfVertices - i));
+                                        for (int j = 1; j <= rand; j++) {
+                                            rand_edge = (new Random()).nextInt((nbrOfVertices - (i+1) + 1)) + (i+1);
+                                            if (!sa_edge.contains(rand_edge)) sa_edge.add(rand_edge);
+                                            else --j;
                                         }
                                         sa.addAll(sa_edge);
                                         sa_edge.clear();
@@ -931,13 +965,7 @@ public class Graf {
                                     }
                                     array = sa.stream().mapToInt(i -> i).toArray();
 
-                                    if (n == 1) grafCreate.put(grafName, new Graf(array));
-                                    else if (n == 2) grafCreate.put(grafName, new UndirectedGraf(array));
-                                    else System.out.println("Unknown command : graph not created:");
-                                    break;
-
-                                case 9:
-                                    //DAG
+                                    grafCreate.put(grafName, new Graf(array));
                                     break;
 
                                 default:
