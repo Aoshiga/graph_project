@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class UndirectedGraf extends Graf{
 
-    UndirectedGraf() {
+    public UndirectedGraf() {
         super();
     }
 
@@ -16,7 +16,7 @@ public class UndirectedGraf extends Graf{
      * Builds an undirected graph from an int array representing a Successor Array Formalism
      * @param sa an int array in the Successor Array formalism
      */
-    UndirectedGraf(int ... sa) {
+    public UndirectedGraf(int... sa) {
         super(sa);
 
         int from = 1;
@@ -35,7 +35,7 @@ public class UndirectedGraf extends Graf{
      * @param file file to be read, must be .dot file
      * @throws IOException if the file was not found or if it is not .dot
      */
-    UndirectedGraf(File file) throws IOException {
+    public UndirectedGraf(File file) throws IOException {
         String extension = "";
         int i = file.getName().lastIndexOf('.');
         if (i > 0) {
@@ -80,7 +80,7 @@ public class UndirectedGraf extends Graf{
      * @param from_id int id representing a node
      * @param to_id int id representing another node
      */
-    void addEdge(int from_id, int to_id) {
+    public void addEdge(int from_id, int to_id) {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
         edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
@@ -244,7 +244,7 @@ public class UndirectedGraf extends Graf{
     /**
      * Exports the graph in a .dot file in the DOT formalism
      */
-    void toDotFile(String fileName){
+    public void toDotFile(String fileName){
         //if filename is empty (""), give a default filename
         if(fileName.equals("")) fileName = "graph";
 
