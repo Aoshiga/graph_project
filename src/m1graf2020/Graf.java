@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Classe de gestion de graphs
+ * @author Baulard Guillaume - Buronfosse Titouan
+ */
 public class Graf {
     //Map<Node, List<Node>> adjList;
     TreeMap<Node, List<Node>> adjList;
@@ -656,18 +660,18 @@ public class Graf {
 
     /**
      *
-     * @param nbrOfEdges
-     * @return
+     * @param nbrOfVertices
+     * @return an array of int in SA format
      */
-    private static int[] randomGraph(int nbrOfEdges) {
+    private static int[] randomGraph(int nbrOfVertices) {
         List<Integer> sa = new ArrayList<>();
         List<Integer> sa_edge = new ArrayList<>(); //eliminate double
         int rand;
         int rand_edge;
-        for (int i = 0; i < nbrOfEdges; ++i) {
-            rand = 1 + (int) (Math.random() * ((nbrOfEdges - 1) + 1));
+        for (int i = 0; i < nbrOfVertices; ++i) {
+            rand = 1 + (int) (Math.random() * ((nbrOfVertices - 1) + 1));
             for (int j = 1; j < rand; j++) {
-                rand_edge = 1 + (int) (Math.random() * ((nbrOfEdges - 1) + 1));
+                rand_edge = 1 + (int) (Math.random() * ((nbrOfVertices - 1) + 1));
                 if (!sa_edge.contains(rand_edge)) sa_edge.add(rand_edge);
             }
             sa.addAll(sa_edge);
@@ -719,6 +723,7 @@ public class Graf {
                         System.out.println("5 : Random connected graph");
                         System.out.println("6 : Random dense graph");
                         System.out.println("7 : Random sparse graph");
+                        System.out.println("8 : Random parametrized graph");
 
                         int kindOfGraf = reader.nextInt();
                         while (!stop) {
@@ -726,6 +731,7 @@ public class Graf {
 
                             /* Definition of variable use in the switch */
                             List<Integer> sa = new ArrayList<>();
+                            int nbrOfVertices;
                             int nbrOfEdges;
                             int[] array;
                             int min;
@@ -777,15 +783,20 @@ public class Graf {
 
                                     System.out.println("Give the file path:");
                                     String path = reader.next();
-                                    grafCreate.put(grafName, new Graf(new File(path)));
+
+                                    System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
+                                    n = reader.nextInt();
+                                    if (n == 1) grafCreate.put(grafName, new Graf(new File(path)));
+                                    if (n == 2) grafCreate.put(grafName, new UndirectedGraf(new File(path)));
                                     break;
 
                                 case 4:
                                     System.out.println("Give the graph name:");
                                     grafName = reader.next();
-                                    System.out.println("Give the number of edges:");
-                                    nbrOfEdges = reader.nextInt();
-                                    array = randomGraph(nbrOfEdges);
+                                    max = 20;
+                                    min = 0;
+                                    nbrOfVertices = (new Random()).nextInt(max - min + 1) + min;
+                                    array = randomGraph(nbrOfVertices);
                                     System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
                                     n = reader.nextInt();
                                     if (n == 1) grafCreate.put(grafName, new Graf(array));
@@ -797,9 +808,10 @@ public class Graf {
                                 case 5:
                                     System.out.println("Give the graph name:");
                                     grafName = reader.next();
-                                    System.out.println("Give the number of edges:");
-                                    nbrOfEdges = reader.nextInt();
-                                    array = randomGraph(nbrOfEdges);
+                                    max = 20;
+                                    min = 0;
+                                    nbrOfVertices = (new Random()).nextInt(max - min + 1) + min;
+                                    array = randomGraph(nbrOfVertices);
                                     System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
                                     n = reader.nextInt();
                                     if (n == 1) grafCreate.put(grafName, new Graf(array));
@@ -811,12 +823,12 @@ public class Graf {
 
                                     List<Node> S = grafCreate.get(grafName).getAllNodes();
 
-                                    rand = (new Random()).nextInt(nbrOfEdges);
+                                    rand = (new Random()).nextInt(nbrOfVertices);
                                     Node current_node = S.get(rand);
                                     S.remove(current_node);
 
                                     while (!S.isEmpty()) {
-                                        rand = (new Random()).nextInt((--nbrOfEdges));
+                                        rand = (new Random()).nextInt((--nbrOfVertices));
                                         Node neighbor_node = S.get(rand);
                                         grafCreate.get(grafName).addEdge(current_node.getId(), neighbor_node.getId());
                                         S.remove(neighbor_node);
@@ -828,20 +840,21 @@ public class Graf {
                                 case 6:
                                     System.out.println("Give the graph name:");
                                     grafName = reader.next();
-                                    System.out.println("Give the number of edges:");
-                                    nbrOfEdges = reader.nextInt();
+                                    max = 20;
+                                    min = 0;
+                                    nbrOfVertices = (new Random()).nextInt(max - min + 1) + min;
                                     System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
                                     n = reader.nextInt();
 
                                     sa_edge.clear();
-                                    if(n==1) min = (int) Math.ceil(0.75 * nbrOfEdges * nbrOfEdges / nbrOfEdges);
-                                    else min = (int) Math.ceil((0.75 * nbrOfEdges * nbrOfEdges)/(2*nbrOfEdges));
-                                    max = nbrOfEdges;
+                                    if(n==1) min = (int) Math.ceil(0.75 * nbrOfVertices * nbrOfVertices / nbrOfVertices);
+                                    else min = (int) Math.ceil((0.75 * nbrOfVertices * nbrOfVertices)/(2*nbrOfVertices));
+                                    max = nbrOfVertices;
 
-                                    for (int i = 0; i < nbrOfEdges; ++i) {
+                                    for (int i = 0; i < nbrOfVertices; ++i) {
                                         rand = (new Random()).nextInt(max - min + 1) + min;
                                         for (int j = 1; j <= rand; j++) {
-                                            rand_edge = (new Random()).nextInt(nbrOfEdges) + 1;
+                                            rand_edge = (new Random()).nextInt(nbrOfVertices) + 1;
                                             if (!sa_edge.contains(rand_edge)) sa_edge.add(rand_edge);
                                             else --j;
                                         }
@@ -859,20 +872,21 @@ public class Graf {
                                 case 7:
                                     System.out.println("Give the graph name:");
                                     grafName = reader.next();
-                                    System.out.println("Give the number of edges:");
-                                    nbrOfEdges = reader.nextInt();
+                                    max = 20;
+                                    min = 0;
+                                    nbrOfVertices = (new Random()).nextInt(max - min + 1) + min;
                                     System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
                                     n = reader.nextInt();
 
                                     sa_edge.clear();
                                     min = 0;
-                                    if(n==1) max = (int) Math.floor(0.25 * nbrOfEdges * nbrOfEdges / nbrOfEdges);
-                                    else max = (int) Math.floor((0.25 * nbrOfEdges * nbrOfEdges)/(2*nbrOfEdges));
+                                    if(n==1) max = (int) Math.floor(0.25 * nbrOfVertices * nbrOfVertices / nbrOfVertices);
+                                    else max = (int) Math.floor((0.25 * nbrOfVertices * nbrOfVertices)/(2*nbrOfVertices));
 
-                                    for (int i = 0; i < nbrOfEdges; ++i) {
+                                    for (int i = 0; i < nbrOfVertices; ++i) {
                                         rand = (new Random()).nextInt(max - min + 1) + min;
                                         for (int j = 1; j <= rand; j++) {
-                                            rand_edge = (new Random()).nextInt(nbrOfEdges) + 1;
+                                            rand_edge = (new Random()).nextInt(nbrOfVertices) + 1;
                                             if (!sa_edge.contains(rand_edge)) sa_edge.add(rand_edge);
                                             else --j;
                                         }
@@ -887,6 +901,44 @@ public class Graf {
                                     else System.out.println("Unknown command : graph not created:");
                                     break;
 
+                                case 8:
+                                    System.out.println("Give the graph name:");
+                                    grafName = reader.next();
+                                    System.out.println("Give the number of vertices:");
+                                    nbrOfVertices = reader.nextInt();
+                                    System.out.println("Give the number of edges:");
+                                    nbrOfEdges = reader.nextInt();
+                                    int cptEdges = 0;
+
+                                    System.out.println("Enter 1 : directed graph || Enter 2 : undirected graph");
+                                    n = reader.nextInt();
+                                    sa_edge.clear();
+
+                                    for (int i = 0; i < nbrOfVertices; ++i) {
+                                        rand = (new Random()).nextInt(nbrOfVertices) + 1;
+                                        if(cptEdges < nbrOfEdges) {
+                                            for (int j = 1; j <= rand; j++) {
+                                                rand_edge = (new Random()).nextInt(nbrOfVertices) + 1;
+                                                if (!sa_edge.contains(rand_edge) && cptEdges < nbrOfEdges) {
+                                                    sa_edge.add(rand_edge);
+                                                    cptEdges++;
+                                                } else --j;
+                                            }
+                                        }
+                                        sa.addAll(sa_edge);
+                                        sa_edge.clear();
+                                        sa.add(0);
+                                    }
+                                    array = sa.stream().mapToInt(i -> i).toArray();
+
+                                    if (n == 1) grafCreate.put(grafName, new Graf(array));
+                                    else if (n == 2) grafCreate.put(grafName, new UndirectedGraf(array));
+                                    else System.out.println("Unknown command : graph not created:");
+                                    break;
+
+                                case 9:
+                                    //DAG
+                                    break;
 
                                 default:
                                     System.out.println("Unknown command, enter a valid command : ");
@@ -1141,211 +1193,5 @@ public class Graf {
 
         } while(!stop);
         reader.close();
-
-
-
-
-
-        /*System.out.println(">>>>>>>> Creating the subject example graph in G");
-        Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
-
-        System.out.println(">>>> Graph SA representation");
-        System.out.println(Arrays.toString(g.toSuccessorArray()));
-
-        System.out.println(">>>> Graph matrix representation");
-        int[][] matrix = g.toAdjMatrix();
-        for (int[] ints : matrix) {
-            System.out.println(Arrays.toString(ints));
-        }
-
-        System.out.println(">>>> Graph information");
-        System.out.println(">> DOT representation\n"+g.toDotString());
-        g.toDotFile("");
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        System.out.println(">> Nodes: ");
-        List<Node> nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        for (Node n: nodes)
-            System.out.println("Node "+n+": degree "+g.degree(n)+" (in: "+g.inDegree(n)+", out: "+g.outDegree(n)+")");
-
-        List<Edge> edges;
-        System.out.println(">> Edges: ");
-        System.out.println("---------------------------");
-        System.out.println("As out-edges");
-        for (Node n: nodes) {
-            edges = g.getOutEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        System.out.println("As in-edges");
-        for (Node n: nodes) {
-            edges = g.getInEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        /////////////////////////////////////////////////////
-
-        System.out.println("\n>>>>>>>> creating isolated node 12");
-        g.addNode(12);
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        System.out.println("Nodes list: "+nodes);
-
-        //// ----------------
-        System.out.println("\n>>>>>>>> Removing node 3");
-        g.removeNode(3);
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        System.out.println("Nodes list: "+nodes);
-
-        System.out.println(">> Edges: ");
-        System.out.println("---------------------------");
-        System.out.println("As out-edges");
-        for (Node n: nodes) {
-            edges = g.getOutEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        System.out.println("As in-edges");
-        for (Node n: nodes) {
-            edges = g.getInEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        System.out.println("\n>>>>>>>> Recreating edges (4, 3), (3, 6), (7, 3), adding edge (12, 3), creating edge (3, 25)");
-        g.addEdge(4, 3);
-        g.addEdge(g.getNode(3), g.getNode(6));
-        g.addEdge(new Edge(7, 3));
-        g.addEdge(new Edge(12, 3));
-        g.addEdge(3, 25);
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        System.out.println("Nodes list: "+nodes);
-
-        System.out.println("\n>>>>>>>>  Edges removal");
-        System.out.println(">>>> Removing existing edges (7, 3) and (4, 8)");
-        g.removeEdge(7, 3);
-        g.removeEdge(4, 8);
-        System.out.println(">>>> Removing absent edge (3, 4)");
-        g.removeEdge(3, 4);
-        System.out.println(">>>> Removing edges whith 1 or 2 not existing end-points: (-3, 4), (6, 0), (4, 11), (-1, -2), (13, 3), (9, 10)");
-        g.removeEdge(-3, 4);
-        g.removeEdge(new Edge(6, 0));
-        g.removeEdge(new Node(4), new Node(11));
-        g.removeEdge(-1, -2);
-        g.removeEdge(13, 3);
-        g.removeEdge(9, 10);
-
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        System.out.println("Nodes list: "+nodes);
-
-        System.out.println("\\n>>>>>>>> adding a self-loop on node 6, and a second edge (1, 4)\"");
-        g.addEdge(6, 6);
-        g.addEdge(1, 4);
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
-        nodes = g.getAllNodes();
-        Collections.sort(nodes);
-        System.out.println("Nodes list: "+nodes);
-        System.out.println("Degree of node 6: "+g.degree(6)+" (in: "+g.inDegree(6)+", out: "+g.outDegree(6)+")");
-
-        System.out.println(">> Edges: ");
-        System.out.println("---------------------------");
-        System.out.println("As out-edges");
-        for (Node n: nodes) {
-            edges = g.getOutEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        System.out.println("As in-edges");
-        for (Node n: nodes) {
-            edges = g.getInEdges(n);
-            Collections.sort(edges);
-            System.out.println(""+n+": "+edges);
-        }
-
-        System.out.println(">>>>>>>>>>    Reverse graph");
-        System.out.println(g.getReverse().toDotString());
-
-        System.out.println(">>>>>>>>>>    Transitive Closure");
-        System.out.println(g.getTransitiveClosure().toDotString());
-
-        System.out.println("\n>>>> Testing incidentEdges");
-        System.out.println(g.getIncidentEdges(1));
-        System.out.println(g.getIncidentEdges(new Node(4)));
-
-        System.out.println("\n>>>> Get all edges");
-        System.out.println(g.getAllEdges());
-
-        System.out.println("\n>>>>>>>>>>    Emptying the graph by removing all its nodes");
-        nodes = g.getAllNodes();
-        for (Node u: nodes)
-            g.removeNode(u);
-        System.out.println("Graph now:");
-        System.out.println(g.toDotString());
-
-        System.out.println(">>>> Searching for node 7");
-        if (g.existsNode(7))
-            System.out.println("Node 7 exists");
-        else
-            System.out.println("There is no Node 7");
-
-        if (g.existsNode(new Node(1)))
-            System.out.println("Node 1 exists");
-        else
-            System.out.println("There is no Node 1");
-
-        System.out.println("\n>>>> Searching for edge (4, 2)");
-        if (g.existsEdge(4, 2))
-            System.out.println("Edge (4, 2) exists");
-        else
-            System.out.println("There is no edge (4, 2)");
-
-        if (g.existsEdge(new Node(1), new Node(2)))
-            System.out.println("Edge (1, 2) exists");
-        else
-            System.out.println("There is no edge (1, 2)");
-
-        if (g.existsEdge(new Edge(6, 7)))
-            System.out.println("Edge (6, 7) exists");
-        else
-            System.out.println("There is no edge (6, 7)");
-
-        System.out.println("\n>>>> ----- New graph for bfs and dfs");
-        Graf g_bis = new Graf(2, 4, 0, 3, 1, 0, 1, 0, 4, 0);
-        System.out.println(">>>> Graph information");
-        System.out.println(">> DOT representation\n"+g_bis.toDotString());
-        List<Node> l_bfs = g_bis.getBFS();
-        System.out.println("BFS : " + Arrays.toString(l_bfs.toArray()));
-
-        List<Node> l_dfs = g_bis.getDFS();
-        System.out.println("DFS : " + Arrays.toString(l_dfs.toArray()));
-
-
-
-        // -------------------------------------------------
-        System.out.println(">>>>>>>> Creating un undirected graphs");
-        UndirectedGraf ug = new UndirectedGraf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
-        System.out.println(">> DOT representation\n"+ug.toDotString());
-        ug.toDotFile("UndirectedGraph");*/
     }
 }
