@@ -249,7 +249,7 @@ public class Graf {
         if(existsNode(from)) addNode(from);
         if(existsNode(to)) addNode(to);
         edgeList.add(new Edge(from, to));
-        getSuccessors(from).add(to);
+        getSuccessors(from.getId()).add(to);
     }
 
     /**
@@ -272,7 +272,7 @@ public class Graf {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         edgeList.add(e);
-        getSuccessors(e.getFrom()).add(e.getTo());
+        getSuccessors(e.getFrom().getId()).add(e.getTo());
     }
 
     /**
@@ -493,17 +493,6 @@ public class Graf {
      */
     public Graf getReverse() {
         Graf reverse = new Graf();
-        /*for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            for (Node n : entry.getValue()) {
-                if (!reverse.adjList.containsKey(n)) {
-                    reverse.addNode(n);
-                }
-                reverse.addEdge(n, entry.getKey());
-            }
-            if (!reverse.adjList.containsKey(entry.getKey())) {
-                reverse.addNode(entry.getKey());
-            }
-        }*/
         for(Node n : getAllNodes()) {
             reverse.addNode(n);
         }
@@ -512,7 +501,7 @@ public class Graf {
         for(Node n : this.getAllNodes()) {
             success = this.getSuccessors(n);
             for (Node s: success) {
-                reverse.addEdge(s, n);
+                reverse.addEdge(s.getId(), n.getId());
             }
         }
         return reverse;
@@ -523,13 +512,17 @@ public class Graf {
      * @return a copy of the graph where all currently mutually reachable nodes have a direct edge between them
      */
     public Graf getTransitiveClosure() {
-        Graf g = this;
-        Graf reverse = getReverse();
-        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
-            List<Node> predecessors = reverse.getSuccessors(entry.getKey());
+        Graf g = new Graf(this.toSuccessorArray());
+        List<Node> nodes = getAllNodes();
+        for (Node u : nodes) {
+            List<Node> predecessors = new ArrayList<>();
+            for (Edge e: getInEdges(u)) {
+                predecessors.add(e.getFrom());
+            }
+
             for (Node p : predecessors) {
-                for (Node s : entry.getValue()) {
-                    g.addEdge(p, s);
+                for (Node s : getSuccessors(u)) {
+                    g.addEdge(p.getId(), s.getId());
                 }
             }
         }
@@ -1351,15 +1344,6 @@ public class Graf {
 
         System.out.println(">>>>>>>>>>    Reverse graph");
         System.out.println(g.getReverse().toDotString());
-        System.out.println(g.getAllEdges());
-        System.out.println(g.getReverse().getAllEdges());
-        for (Node n: nodes) {
-            System.out.println(g.getSuccessors(n));
-        }
-        System.out.println("-----");
-        for (Node n: nodes) {
-            System.out.println(g.getReverse().getSuccessors(n));
-        }
 
         System.out.println(">>>>>>>>>>    Transitive Closure");
         System.out.println(g.getTransitiveClosure().toDotString());
