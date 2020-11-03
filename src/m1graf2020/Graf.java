@@ -31,9 +31,8 @@ public class Graf {
             if (i == sa.length -1) break;
             if (sa[i] != 0) {
                 //if(!getSuccessors(from).contains(new Node(sa[i]))) getSuccessors(from).add(new Node(sa[i]));
-                //if(!adjList.get(new Node(from)).contains(new Node(sa[i]))) adjList.get(new Node(from)).add(new Node(sa[i]));
-                //edgeList.add(new Edge(new Node(from), new Node(sa[i])));
-                addEdge(from, sa[i]);
+                if(!adjList.get(new Node(from)).contains(new Node(sa[i]))) adjList.get(new Node(from)).add(new Node(sa[i]));
+                edgeList.add(new Edge(new Node(from), new Node(sa[i])));
             } else {
                 addNode(++from);
             }
@@ -249,8 +248,8 @@ public class Graf {
     void addEdge(Node from, Node to) {
         if(existsNode(from)) addNode(from);
         if(existsNode(to)) addNode(to);
-        if(!edgeList.contains(new Edge(from, to))) edgeList.add(new Edge(from, to));
-        if (!getSuccessors(from).contains(to)) getSuccessors(from).add(to);
+        edgeList.add(new Edge(from, to));
+        getSuccessors(from).add(to);
     }
 
     /**
@@ -261,8 +260,8 @@ public class Graf {
     void addEdge(int from_id, int to_id) {
         if(getNode(from_id) == null) addNode(from_id);
         if(getNode(to_id) == null) addNode(to_id);
-        if(!edgeList.contains(new Edge(from_id, to_id))) edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
-        if (!getSuccessors(from_id).contains(new Node(to_id))) getSuccessors(from_id).add(new Node(to_id));
+        edgeList.add(new Edge(new Node(from_id), new Node(to_id)));
+        getSuccessors(from_id).add(new Node(to_id));
     }
 
     /**
@@ -272,8 +271,8 @@ public class Graf {
     void addEdge(Edge e) {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
-        if(!edgeList.contains(e)) edgeList.add(e);
-        if (!getSuccessors(e.getFrom()).contains(e.getTo())) getSuccessors(e.getFrom()).add(e.getTo());
+        edgeList.add(e);
+        getSuccessors(e.getFrom()).add(e.getTo());
     }
 
     /**
@@ -303,8 +302,10 @@ public class Graf {
      * @param e edge to be removed
      */
     public void removeEdge(Edge e) {
-        getSuccessors(e.getFrom()).remove(e.getTo());
-        edgeList.remove(e);
+        if(getSuccessors(e.getFrom()) != null) {
+            getSuccessors(e.getFrom()).remove(e.getTo());
+            edgeList.remove(e);
+        }
     }
 
     /**
@@ -492,7 +493,7 @@ public class Graf {
      */
     public Graf getReverse() {
         Graf reverse = new Graf();
-        for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
+        /*for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
             for (Node n : entry.getValue()) {
                 if (!reverse.adjList.containsKey(n)) {
                     reverse.addNode(n);
@@ -501,6 +502,17 @@ public class Graf {
             }
             if (!reverse.adjList.containsKey(entry.getKey())) {
                 reverse.addNode(entry.getKey());
+            }
+        }*/
+        for(Node n : getAllNodes()) {
+            reverse.addNode(n);
+        }
+
+        List<Node> success;
+        for(Node n : this.getAllNodes()) {
+            success = this.getSuccessors(n);
+            for (Node s: success) {
+                reverse.addEdge(s, n);
             }
         }
         return reverse;
@@ -511,26 +523,13 @@ public class Graf {
      * @return a copy of the graph where all currently mutually reachable nodes have a direct edge between them
      */
     public Graf getTransitiveClosure() {
-        /*Graf g = this;
+        Graf g = this;
         Graf reverse = getReverse();
         for (Map.Entry<Node, List<Node>> entry : adjList.entrySet()) {
             List<Node> predecessors = reverse.getSuccessors(entry.getKey());
             for (Node p : predecessors) {
                 for (Node s : entry.getValue()) {
                     g.addEdge(p, s);
-                }
-            }
-        }
-        return g;*/
-        Graf g = this;
-        int nbNodes = nbNodes();
-
-        for(int i=1; i<=nbNodes; ++i) {
-            for (int j = 1; j <= nbNodes; ++j) {
-                for (int k = 1; k <= nbNodes; ++k) {
-                    if (edgeList.contains(new Edge(i, j)) || (edgeList.contains(new Edge(i, k)) && edgeList.contains(new Edge(k, j)))) {
-                        g.addEdge(i, j);
-                    }
                 }
             }
         }
@@ -681,7 +680,7 @@ public class Graf {
 
     public static void main(String[] args) {
 
-        boolean stop = false;
+ /*       boolean stop = false;
         Map<String, Graf> grafCreate = new HashMap<>();
         String grafName;
         Scanner reader = new Scanner(System.in);  // Reading from System.in
@@ -935,7 +934,6 @@ public class Graf {
                                     while(cptEdges < nbrOfEdges) {
                                         rand1 = (new Random()).nextInt(nbrOfVertices) + 1;
                                         rand2 = (new Random()).nextInt(nbrOfVertices) + 1;
-                                        System.out.println(rand1 + " | " + rand2);
                                         if(grafCreate.get(grafName).existsEdge(rand1, rand2)) cptEdges--;
                                         else grafCreate.get(grafName).addEdge(rand1, rand2);
                                         cptEdges++;
@@ -1221,5 +1219,168 @@ public class Graf {
 
         } while(!stop);
         reader.close();
+            }
+}
+
+*/
+        System.out.println(">>>>>>>> Creating the subject example graph in G");
+        Graf g = new Graf(2, 4, 0, 0, 6, 0, 2, 3, 5, 8, 0, 0, 4, 7, 0, 3, 0, 7, 0);
+        System.out.println(">>>> Graph information");
+        System.out.println(">> DOT representation\n"+g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        System.out.println(">> Nodes: ");
+        List<Node> nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        for (Node n: nodes)
+            System.out.println("Node "+n+": degree "+g.degree(n)+" (in: "+g.inDegree(n)+", out: "+g.outDegree(n)+")");
+
+        List<Edge> edges;
+        System.out.println(">> Edges: ");
+        System.out.println("---------------------------");
+        System.out.println("As out-edges");
+        for (Node n: nodes) {
+            edges = g.getOutEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        System.out.println("As in-edges");
+        for (Node n: nodes) {
+            edges = g.getInEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        /////////////////////////////////////////////////////
+
+        System.out.println("\n>>>>>>>> creating isolated node 12");
+        g.addNode(12);
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        System.out.println("Nodes list: "+nodes);
+
+        System.out.println("\n>>>>>>>> Removing node 3");
+        g.removeNode(3);
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        System.out.println("Nodes list: "+nodes);
+
+        System.out.println(">> Edges: ");
+        System.out.println("---------------------------");
+        System.out.println("As out-edges");
+        for (Node n: nodes) {
+            edges = g.getOutEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        System.out.println("As in-edges");
+        for (Node n: nodes) {
+            edges = g.getInEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        System.out.println("\n>>>>>>>> Recreating edges (4, 3), (3, 6), (7, 3), adding edge (12, 3), creating edge (3, 25)");
+        g.addEdge(new Edge(4, 3));
+        g.addEdge(new Edge(3, 6));
+        g.addEdge(new Edge(7, 3));
+        g.addEdge(new Edge(12, 3));
+        g.addEdge(3, 25);
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        System.out.println("Nodes list: "+nodes);
+
+        System.out.println("");
+        System.out.println("\n>>>>>>>>  Edges removal");
+        System.out.println(">>>> Removing existing edges (7, 3) and (4, 8)");
+        g.removeEdge(7, 3);
+        g.removeEdge(4, 8);
+        System.out.println(">>>> Removing absent edge (3, 4)");
+        g.removeEdge(3, 4);
+        System.out.println(">>>> Removing edges whith 1 or 2 not existing end-points: (-3, 4), (6, 0), (4, 11), (-1, -2), (13, 3), (9, 10)");
+        g.removeEdge(-3, 4);
+        g.removeEdge(6, 0);
+        g.removeEdge(4, 11);
+        g.removeEdge(-1, -2);
+        g.removeEdge(13, 3);
+        g.removeEdge(9, 10);
+
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        System.out.println("Nodes list: "+nodes);
+
+        System.out.println("\\n>>>>>>>> adding a self-loop on node 6, and a second edge (1, 4)\"");
+        g.addEdge(6, 6);
+        g.addEdge(1, 4);
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+        System.out.println(""+g.nbNodes()+" nodes, "+g.nbEdges()+" edges");
+        nodes = g.getAllNodes();
+        Collections.sort(nodes);
+        System.out.println("Nodes list: "+nodes);
+        System.out.println("Degree of node 6: "+g.degree(6)+" (in: "+g.inDegree(6)+", out: "+g.outDegree(6)+")");
+
+        System.out.println(">> Edges: ");
+        System.out.println("---------------------------");
+        System.out.println("As out-edges");
+        for (Node n: nodes) {
+            edges = g.getOutEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        System.out.println("As in-edges");
+        for (Node n: nodes) {
+            edges = g.getInEdges(n);
+            Collections.sort(edges);
+            System.out.println(""+n+": "+edges);
+        }
+
+        System.out.println(">>>>>>>>>>    Reverse graph");
+        System.out.println(g.getReverse().toDotString());
+        System.out.println(g.getAllEdges());
+        System.out.println(g.getReverse().getAllEdges());
+        for (Node n: nodes) {
+            System.out.println(g.getSuccessors(n));
+        }
+        System.out.println("-----");
+        for (Node n: nodes) {
+            System.out.println(g.getReverse().getSuccessors(n));
+        }
+
+        System.out.println(">>>>>>>>>>    Transitive Closure");
+        System.out.println(g.getTransitiveClosure().toDotString());
+
+        System.out.println(">>>>>>>>>>    Emptying the graph by removing all its nodes");
+        nodes = g.getAllNodes();
+        for (Node u: nodes)
+            g.removeNode(u);
+        System.out.println("Graph now:");
+        System.out.println(g.toDotString());
+
+        System.out.println(">>>> Searching for node 7");
+        if (g.existsNode(7))
+            System.out.println("Node 7 exists");
+        else
+            System.out.println("There is no Node 7");
+
+        System.out.println(">>>> Searching for edge (4, 2)");
+        if (g.existsEdge(4, 2))
+            System.out.println("Edge (4, 2) exists");
+        else
+            System.out.println("There is no edge (4, 2)");
     }
 }
