@@ -40,7 +40,7 @@ public class Graf {
     }
 
     /**
-     * Builds a directed graph from a Dot file
+     * Builds a directed graph or a flow network from a Dot file
      * @param file file to be read, must be .dot file
      * @throws IOException if the file was not found or if it is not .dot
      */
@@ -69,6 +69,14 @@ public class Graf {
                 line = reader.readLine();
             }
         }
+    }
+
+    public List<Edge> getEdgeList() {
+        return edgeList;
+    }
+
+    public TreeMap<Node, List<Node>> getAdjList() {
+        return adjList;
     }
 
     /**
@@ -266,6 +274,18 @@ public class Graf {
 
     /**
      * Adds an edge fromm one node to another, adds the nodes to the graph if needed
+     * @param from_id int id representing a node
+     * @param to_id int id representing another node
+     */
+    public void addEdge(int from_id, int to_id, int weight) {
+        if(getNode(from_id) == null) addNode(from_id);
+        if(getNode(to_id) == null) addNode(to_id);
+        edgeList.add(new Edge(new Node(from_id), new Node(to_id), weight));
+        getSuccessors(from_id).add(new Node(to_id));
+    }
+
+    /**
+     * Adds an edge fromm one node to another, adds the nodes to the graph if needed
      * @param e edge to be added
      */
     void addEdge(Edge e) {
@@ -378,6 +398,15 @@ public class Graf {
             }
         }
         return incidentEdges;
+    }
+
+    public Edge getEdge(int from_id, int to_id) {
+        for (Edge e : edgeList) {
+            if (e.getTo().getId() == to_id || e.getFrom().getId() == from_id) {
+                return e;
+            }
+        }
+        return null;
     }
 
     /**

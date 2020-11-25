@@ -3,18 +3,24 @@ package m1graf2020;
 public class Node implements Comparable<Node>{
 
     private final int id;
+    private String label;
     private static int biggestId = 0;
 
-    Node() {
+    public Node() {
         this.id = ++biggestId;
     }
 
-    Node(int id) {
+    public Node(int id) {
         this.id = id;
         if(this.id > biggestId) biggestId = this.id;
     }
 
-    // Ne fonctionne pas
+    public Node(int id, String label) {
+        this.id = id;
+        if(this.id > biggestId) biggestId = this.id;
+        this.label = label;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj == this) return true;
@@ -35,6 +41,10 @@ public class Node implements Comparable<Node>{
 
     public int getId() {
         return id;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public static int getBiggestId() {
