@@ -402,7 +402,7 @@ public class Graf {
 
     public Edge getEdge(int from_id, int to_id) {
         for (Edge e : edgeList) {
-            if (e.getTo().getId() == to_id || e.getFrom().getId() == from_id) {
+            if (e.getTo().getId() == to_id && e.getFrom().getId() == from_id) {
                 return e;
             }
         }
