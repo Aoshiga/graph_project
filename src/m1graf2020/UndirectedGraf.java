@@ -67,7 +67,7 @@ public class UndirectedGraf extends Graf{
      * @param from a node
      * @param to another node
      */
-    void addEdge(Node from, Node to) {
+    public void addEdge(Node from, Node to) {
         if(!existsNode(from)) addNode(from);
         if(!existsNode(to)) addNode(to);
         edgeList.add(new Edge(from, to));
@@ -92,7 +92,7 @@ public class UndirectedGraf extends Graf{
      * Adds an edge fromm one node to another, adds the nodes to the graph if needed
      * @param e edge to be added
      */
-    void addEdge(Edge e) {
+    public void addEdge(Edge e) {
         if(getNode(e.getFrom().getId()) == null) addNode(e.getFrom());
         if(getNode(e.getTo().getId()) == null) addNode(e.getTo());
         edgeList.add(e);
