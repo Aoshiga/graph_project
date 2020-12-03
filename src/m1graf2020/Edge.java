@@ -9,48 +9,48 @@ public class Edge implements Comparable<Edge> {
 
     Edge() {}
 
-    Edge(int from_id, int to_id) {
+    public Edge(int from_id, int to_id) {
         this.from = new Node(from_id);
         this.to = new Node(to_id);
     }
 
-    Edge(int from_id, int to_id, int weight) {
+    public Edge(int from_id, int to_id, int weight) {
         this.from = new Node(from_id);
         this.to = new Node(to_id);
         this.weight = weight;
     }
 
-    Edge(int from_id, int to_id, String label) {
+    public Edge(int from_id, int to_id, String label) {
         this.from = new Node(from_id);
         this.to = new Node(to_id);
         this.label = label;
     }
 
-    Edge(int from_id, int to_id, int weight, String label) {
+    public Edge(int from_id, int to_id, int weight, String label) {
         this.from = new Node(from_id);
         this.to = new Node(to_id);
         this.weight = weight;
         this.label = label;
     }
 
-    Edge(Node from, Node to) {
+    public Edge(Node from, Node to) {
         this.from = from;
         this.to = to;
     }
 
-    Edge(Node from, Node to, int weight) {
+    public Edge(Node from, Node to, int weight) {
         this.from = from;
         this.to = to;
         this.weight = weight;
     }
 
-    Edge(Node from, Node to, String label) {
+    public Edge(Node from, Node to, String label) {
         this.from = from;
         this.to = to;
         this.label = label;
     }
 
-    Edge(Node from, Node to, int weight, String label) {
+    public Edge(Node from, Node to, int weight, String label) {
         this.from = from;
         this.to = to;
         this.weight = weight;

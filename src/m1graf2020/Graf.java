@@ -623,7 +623,7 @@ public class Graf {
     /**
      * Recursively searches (depth-first) from a node
      */
-    public void dfs_visit(List<Node> dfs, Node u, color[] color, Map<Node, Integer> index) {
+    private void dfs_visit(List<Node> dfs, Node u, color[] color, Map<Node, Integer> index) {
         color[index.get(u)] = Graf.color.GREY;
         for (Node v : getSuccessors(u)) {
             if (color[index.get(v)] == Graf.color.WHITE) {
